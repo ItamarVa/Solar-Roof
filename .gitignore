@@ -1,0 +1,19 @@
+# Personal info - price offers and contracts
+הצעת מחיר-קדמה סולאר.pdf
+הצעת מחיר Volta Solar.pdf
+הצעת מחיר - כלמוביל Energy.pdf
+כלמוביל Energy/הסכם מלא - כלמוביל.pdf
+
+# Extracted text from personal documents
+_extracted.txt
+
+# Photos (roof/house images)
+*.jpg
+*.png
+
+# AI model cache
+.fastembed_cache/
+
+# OS files
+.DS_Store
+Thumbs.db

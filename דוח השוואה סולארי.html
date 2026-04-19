@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דוח השוואת מערכות סולאריות — משפחת ולדמן</title>
+<!-- אייקון לשונית: שמש צהובה (SVG מוטמע — דפדפנים לא משתמשים ישירות באימוג'י כ-favicon) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg transform='translate(16%2C16)'%3E%3Ccircle r='6.5' fill='%23FFCA28' stroke='%23F9A825' stroke-width='0.4'/%3E%3Cg fill='%23FFB300'%3E%3Crect x='-1' y='-13' width='2' height='5' rx='0.5'/%3E%3Crect x='-1' y='8' width='2' height='5' rx='0.5'/%3E%3Crect x='-13' y='-1' width='5' height='2' rx='0.5'/%3E%3Crect x='8' y='-1' width='5' height='2' rx='0.5'/%3E%3C/g%3E%3Cg fill='%23FFB300'%3E%3Crect x='-1' y='-12' width='2' height='4' rx='0.5' transform='rotate(45)'/%3E%3Crect x='-1' y='8' width='2' height='4' rx='0.5' transform='rotate(45)'/%3E%3Crect x='-12' y='-1' width='4' height='2' rx='0.5' transform='rotate(45)'/%3E%3Crect x='8' y='-1' width='4' height='2' rx='0.5' transform='rotate(45)'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --primary: #1a73e8;
+  --primary-light: #e8f0fe;
+  --green: #0d904f;
+  --green-bg: #e6f4ea;
+  --yellow: #f9ab00;
+  --yellow-bg: #fef7e0;
+  --red: #d93025;
+  --red-bg: #fce8e6;
+  --text: #202124;
+  --text-secondary: #5f6368;
+  --border: #dadce0;
+  --volta-color: #ff6b35;
+  --kedma-color: #2196f3;
+  --calmobile-color: #4caf50;
+  --solarfield-color: #9c27b0;
+  --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+h1 { font-size: 2rem; margin-bottom: 8px; color: var(--primary); }
+h2 { font-size: 1.5rem; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 3px solid var(--primary); color: var(--text); }
+h3 { font-size: 1.15rem; margin: 24px 0 12px; color: var(--text); }
+.subtitle { color: var(--text-secondary); font-size: 1rem; margin-bottom: 24px; }
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+.summary-card {
+  background: var(--primary-light);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+.summary-card .value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+.summary-card .label { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+  margin: 16px 0;
+}
+.comparison-table th, .comparison-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  text-align: right;
+  vertical-align: top;
+}
+.comparison-table thead th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  position: sticky;
+  top: 44px;
+  z-index: 12;
+}
+.comparison-table tbody tr:nth-child(even) { background: #f8f9fa; }
+.comparison-table tbody tr:hover { background: var(--primary-light); }
+.comparison-table .category-row {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.comparison-table .category-row td {
+  border-bottom: 2px solid var(--primary);
+  position: sticky;
+  top: 80px;
+  z-index: 11;
+  background: #e8eaed;
+}
+.advantage { background: var(--green-bg) !important; }
+.neutral { background: var(--yellow-bg) !important; }
+.concern { background: var(--red-bg) !important; }
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.tag-green { background: var(--green-bg); color: var(--green); }
+.tag-yellow { background: var(--yellow-bg); color: #e37400; }
+.tag-red { background: var(--red-bg); color: var(--red); }
+.tag-blue { background: var(--primary-light); color: var(--primary); }
+.insight-box {
+  border-right: 4px solid var(--primary);
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: var(--primary-light);
+  border-radius: 0 8px 8px 0;
+}
+.warning-box {
+  border-right: 4px solid var(--red);
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: var(--red-bg);
+  border-radius: 0 8px 8px 0;
+}
+.tip-box {
+  border-right: 4px solid var(--green);
+  padding: 16px 20px;
+  margin: 16px 0;
+  background: var(--green-bg);
+  border-radius: 0 8px 8px 0;
+}
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+  margin: 16px 0;
+}
+.control-group { display: flex; flex-direction: column; gap: 4px; }
+.control-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.control-group input[type="range"] { width: 220px; accent-color: var(--primary); }
+.control-group select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.range-value { font-size: 1.1rem; font-weight: 700; color: var(--primary); min-width: 80px; }
+.chart-container { position: relative; width: 100%; max-width: 100%; margin: 16px 0; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 900px) { .chart-row { grid-template-columns: 1fr; } }
+.toggle-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+.toggle-btn {
+  padding: 6px 16px;
+  border: 2px solid;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.toggle-btn.active { color: white; }
+.toggle-btn:not(.active) { background: white; }
+.future-placeholder {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 16px 0;
+}
+.question-list { list-style: none; padding: 0; }
+.question-list li {
+  padding: 8px 16px;
+  margin: 6px 0;
+  background: var(--primary-light);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+.question-list li::before { content: "← "; font-weight: 700; color: var(--primary); }
+.section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -20px -20px 24px -20px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+.section-nav a {
+  text-decoration: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: var(--primary-light);
+  white-space: nowrap;
+}
+.section-nav a:hover { background: var(--primary); color: white; }
+.logo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.date-tag { font-size: 0.85rem; color: var(--text-secondary); }
+details { margin: 8px 0; }
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 8px 0;
+}
+.pergola-table { margin-top: 16px; }
+.footer {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 1100px) {
+  body { overflow-x: auto; }
+}
+@media print {
+  .section-nav, .controls-row, .toggle-row, .report-toolbar { display: none; }
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  body { padding: 0; }
+  .comparison-table thead th,
+  .comparison-table .category-row td { position: static; }
+  .report-collapsible { break-inside: avoid; border: 1px solid #ccc; }
+  .report-collapsible.is-collapsed .report-collapsible__panel,
+  .report-collapsible .report-collapsible__panel { display: block !important; }
+  .report-collapsible__trigger { display: none !important; }
+  .report-collapsible__panel { padding: 0 !important; }
+}
+.report-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #e8f0fe 0%, #ffffff 55%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(26, 115, 232, 0.08);
+}
+.report-toolbar__hint { font-size: 0.88rem; color: var(--text-secondary); max-width: 520px; line-height: 1.5; }
+.report-toolbar__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.report-toolbar button {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--primary);
+  background: #fff;
+  color: var(--primary);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.report-toolbar button:hover {
+  background: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.15);
+}
+.report-toolbar button.report-toolbar__primary {
+  background: var(--primary);
+  color: #fff;
+}
+.report-toolbar button.report-toolbar__primary:hover {
+  filter: brightness(1.05);
+}
+.report-collapsible {
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
+}
+.report-collapsible:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07); }
+.report-collapsible.is-open {
+  border-color: rgba(26, 115, 232, 0.35);
+  box-shadow: 0 4px 18px rgba(26, 115, 232, 0.1);
+}
+.report-collapsible__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  font: inherit;
+  font-size: 1.28rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+  border: none;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.report-collapsible__trigger:hover { background: var(--primary-light); }
+.report-collapsible.is-open .report-collapsible__trigger {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.report-collapsible__title { flex: 1; }
+.report-collapsible__chev {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-left: 3px solid var(--primary);
+  border-bottom: 3px solid var(--primary);
+  transform: rotate(-45deg);
+  transition: transform 0.3s ease;
+  margin-inline-start: 4px;
+}
+.report-collapsible.is-open .report-collapsible__chev { transform: rotate(135deg); }
+.report-collapsible.is-collapsed .report-collapsible__panel { display: none; }
+.report-collapsible__panel { padding: 0 4px 8px; }
+.report-collapsible__panel > .card {
+  margin: 0 12px 16px;
+  box-shadow: none;
+  border: 1px solid #eef0f3;
+}
+.conclusion-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+}
+@media (min-width: 700px) {
+  .conclusion-grid { grid-template-columns: 1fr 1fr; }
+}
+.conclusion-card {
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: #fafbfd;
+  border-right: 4px solid var(--primary);
+}
+.conclusion-card strong { display: block; margin-bottom: 6px; color: var(--text); }
+.conclusion-card--highlight {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #e8f4ea 0%, #fff 100%);
+  border-right-color: var(--green);
+}
+.panel-model-row td { background: #f0f7ff !important; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav class="section-nav">
+  <a href="#summary">סיכום מנהלים</a>
+  <a href="#comparison">טבלת השוואה</a>
+  <a href="#financial">סימולטור פיננסי</a>
+  <a href="#warranty">אחריות ושקט נפשי</a>
+  <a href="#research">רקע שוק וחברות</a>
+  <a href="#pergola">פרגולה</a>
+  <a href="#future">הצעות עתידיות</a>
+  <a href="#panel-comparison">השוואת פאנלים מפורטת</a>
+  <a href="#questions">שאלות לפגישות</a>
+  <a href="#tariff">תעריפים</a>
+  <a href="#final-conclusions">מסקנות</a>
+</nav>
+
+<div class="report-toolbar" role="region" aria-label="ניווט מהיר בדוח">
+  <p class="report-toolbar__hint">כל חלקי הדוח למטה סגורים כברירת מחדל — לחצו על כותרת כדי לפתוח. הדף נשאר שלם; שום חלק לא נמחק.</p>
+  <div class="report-toolbar__actions">
+    <button type="button" class="report-toolbar__primary" id="expandAllSections">פתח את כל החלקים</button>
+    <button type="button" id="collapseAllSections">סגור את כל החלקים</button>
+  </div>
+</div>
+
+<div class="logo-header">
+  <div>
+    <h1>דוח השוואת מערכות סולאריות</h1>
+    <p class="subtitle">משפחת ולדמן — עינת 520 | גג ראשי בלבד (20 פאנלים) | 3 הצעות מחיר | ללא מערכת אגירה</p>
+  </div>
+  <span class="date-tag">עודכן: אפריל 2026</span>
+</div>
+
+<!-- ====== EXECUTIVE SUMMARY ====== -->
+<section id="summary">
+<h2>סיכום מנהלים</h2>
+<div class="card">
+  <p>דוח זה משווה <strong>שלוש הצעות מחיר</strong> שהתקבלו למערכת סולארית על הגג הראשי (20 פאנלים), ומספק כלים אינטראקטיביים לבחינת הכדאיות הכלכלית. הדוח מוכן לקליטת הצעה נוספת מסולארפילד.</p>
+  <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:12px;"><strong>מחירי הסיכום למטה</strong> — בסיס משווה: <strong>ללא מערכת שטיפה אוטומטית</strong> (בוולטה מנוכים 5,500 ₪ מהמחיר המלא 65,113 ₪). קדמה וכלמוביל — המחיר המקורי כבר ללא שטיפה אוטומטית.</p>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="value">59,613 ₪</div>
+      <div class="label">וולטה סולאר | 12 kWp (ללא שטיפה אוטומטית)</div>
+    </div>
+    <div class="summary-card">
+      <div class="value">64,971 ₪</div>
+      <div class="label">קדמה סולאר | 13.4 kWp</div>
+    </div>
+    <div class="summary-card" style="background: var(--green-bg);">
+      <div class="value" style="color: var(--green);">58,339 ₪</div>
+      <div class="label">כלמוביל Energy | 12 kWp</div>
+    </div>
+    <div class="summary-card" style="background: var(--green-bg);">
+      <div class="value" style="color: var(--green);">~2%</div>
+      <div class="label">כלמוביל זולה מוולטה (בסיס משווה, אותו הספק)</div>
+    </div>
+  </div>
+
+  <h3>ממצאים מרכזיים</h3>
+  <div class="insight-box">
+    <strong>כלמוביל Energy — המחיר הנמוך ביותר:</strong> 58,339 ₪ עבור 12 kWp (4,862 ₪/kWp) — בהשוואה שווה (ללא שטיפה אוטומטית) זולה ב-~2% מוולטה באותו הספק וטכנולוגיה זהה (תדיראן 600W + SolarEdge). במחיר המלא כולל שטיפה אצל וולטה — ההפרש גדול יותר (~10%). קדמה מספקת את ה-kWp הזול ביותר (4,849 ₪) אך עם פאנלים אחרים (AIKO 670W) ו-13.4 kWp.
+  </div>
+  <div class="insight-box">
+    <strong>קדמה מייצרת הכי הרבה</strong> — עם 20 פאנלים של 670W (13.4 kWp), קדמה צפויה לייצר <strong>~20,700 kWh/שנה</strong> (על פי תחזית קדמה — 1,545 kWh/kWp), לעומת 17,616 (וולטה) ו-17,200 (כלמוביל). תחזית קדמה בוססה על פאנלים של 650W — כלומר ההערכה <strong>שמרנית</strong> והייצור בפועל עם פאנלים של 670W צפוי להיות שווה או גבוה יותר. נציג כלמוביל טען שדגמי "ביניים" (כמו 670W) עלולים ליצור בעיה בזמינות חלפים — אך בדיקה מעמיקה מצביעה על כך שזהו <strong>טיעון מכירתי</strong> ולא חשש טכני אמיתי (AIKO היא ענקית Tier 1 עולמית, ומערכת SolarEdge תומכת בערבוב פאנלים שונים).
+  </div>
+  <div class="warning-box">
+    <strong>אחריות על תפוקה — הבדל קריטי:</strong> וולטה מספקת אחריות תפוקה אוטומטית (סטייה מעל 5% = פיצוי). קדמה מתנה את אחריות התפוקה בחוזה תחזוקה חיצוני בתשלום (סף 10%). כלמוביל — לא צוינה אחריות תפוקה ייעודית מהחברה (רק אחריות יצרן על הפאנלים). יש לבדוק בהסכם.
+  </div>
+  <div class="tip-box">
+    <strong>שטיפה — שלוש גישות שונות:</strong> וולטה כוללת מערכת שטיפה אוטומטית (Solar Clean) במחיר — <strong>5,500 ₪</strong> (מפורט בהצעה). קדמה מספקת רק ערכה ידנית (Green Brush, 2,290 ₪). כלמוביל — ללא שטיפה, אופציה לאוטומטית ב-6,000 ₪. <strong>נטרול מערכת שטיפה:</strong> מחיר בסיס ללא שטיפה אוטומטית — וולטה 59,613 ₪, קדמה 64,971 ₪, כלמוביל 58,339 ₪. <strong>שימו לב</strong> — ויתור על שטיפה אוטומטית עלול לבטל אחריות תפוקה אצל וולטה (חוזה מתנה בהפעלת מערכת שטיפה). אצל קדמה — אחריות תפוקה מותנית בחוזה תחזוקה חיצוני בתשלום.
+  </div>
+</div>
+</section>
+
+<!-- ====== COMPARISON TABLE ====== -->
+<section id="comparison" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-comparison">
+  <span class="report-collapsible__title">טבלת השוואה מלאה</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-comparison">
+<div class="card">
+<table class="comparison-table" id="mainComparisonTable">
+<thead>
+<tr>
+  <th style="min-width:200px">פרמטר</th>
+  <th style="min-width:200px; background: var(--volta-color);">וולטה סולאר</th>
+  <th style="min-width:200px; background: var(--kedma-color);">קדמה סולאר</th>
+  <th style="min-width:200px; background: var(--calmobile-color);">כלמוביל Energy</th>
+  <th style="min-width:200px; background: var(--solarfield-color);">סולארפילד</th>
+</tr>
+</thead>
+<tbody>
+<tr class="panel-model-row"><td>דגם מלא (מק״ט)</td><td><strong>Tadiran DM600M10T-B72HSW</strong></td><td class="advantage"><strong>AIKO COMET 3N72 (AIKO-A670-MDE72Mw)</strong></td><td><strong>Tadiran N-Type Bifacial 600W</strong></td><td class="future-cell">—</td></tr>
+<!-- Technical -->
+<tr class="category-row"><td colspan="5">פרטים טכניים</td></tr>
+<tr><td>הספק לפאנל</td><td>600W</td><td class="advantage">670W</td><td>600W</td><td class="future-cell">—</td></tr>
+<tr><td>טכנולוגיית תאים</td><td>N-Type TOPCon</td><td class="advantage">N-Type ABC (Back Contact)</td><td>N-Type TOPCon Bifacial</td><td class="future-cell">—</td></tr>
+<tr><td>יעילות מודול (מפרט יצרן)</td><td>23.2%</td><td class="advantage">24.8%</td><td>23.2%</td><td class="future-cell">—</td></tr>
+<tr><td>דגרדציה (שנה 1 / שנתית אחר כך)</td><td>≤2% / ≤0.55%</td><td class="advantage">≤1% / ≤0.35%</td><td>0.4% / 0.4% (לפי תחזית החברה)</td><td class="future-cell">—</td></tr>
+<tr><td>מקדם טמפרטורה Pmax</td><td>-0.29%/°C</td><td class="advantage">-0.26%/°C</td><td>-0.29%/°C</td><td class="future-cell">—</td></tr>
+<tr><td>מספר פאנלים (גג ראשי)</td><td>20</td><td>20</td><td>20</td><td class="future-cell">—</td></tr>
+<tr><td>הספק מערכת</td><td>12 kWp</td><td class="advantage">13.4 kWp</td><td>12 kWp</td><td class="future-cell">—</td></tr>
+<tr><td>ממיר</td><td>SolarEdge</td><td>SolarEdge 25kW מכויל ל-15</td><td>SolarEdge (10 או 15 לפי הספק)</td><td class="future-cell">—</td></tr>
+<tr><td>אופטימייזרים</td><td>SolarEdge — לכל פאנל</td><td>SolarEdge — לכל פאנל</td><td>SolarEdge P370–P601 — לכל פאנל</td><td class="future-cell">—</td></tr>
+<tr><td>דירוג פאנלים</td><td><span class="tag tag-blue">Tier 1</span></td><td><span class="tag tag-blue">Tier 1</span></td><td><span class="tag tag-blue">Tier 1</span></td><td class="future-cell">—</td></tr>
+
+<!-- Financial -->
+<tr class="category-row"><td colspan="5">נתונים כלכליים</td></tr>
+<tr><td>מחיר כולל (כולל מע"מ)</td><td>65,113 ₪</td><td>64,971 ₪</td><td class="advantage">58,339 ₪</td><td class="future-cell">—</td></tr>
+<tr style="background: rgba(255,193,7,0.08);"><td>מחיר בסיס — ללא שטיפה אוטומטית **</td><td>59,613 ₪</td><td>64,971 ₪ (כבר ללא)</td><td class="advantage">58,339 ₪ (כבר ללא)</td><td class="future-cell">—</td></tr>
+<tr><td>עלות / שווי מערכת שטיפה (מוצעת)</td><td>5,500 ₪ (כלולה במחיר המלא)</td><td>לא מוצעת אוטומטית — ערכה ידנית 2,290 ₪</td><td>6,000 ₪ (אופציה)</td><td class="future-cell">—</td></tr>
+<tr><td>מחיר ל-kWp מותקן</td><td>5,426 ₪</td><td class="advantage">4,849 ₪</td><td class="advantage">4,862 ₪</td><td class="future-cell">—</td></tr>
+<tr><td>ייצור שנתי צפוי (שנה 1)</td><td>17,616 kWh</td><td class="advantage">~20,700 kWh *</td><td>17,200 kWh</td><td class="future-cell">—</td></tr>
+<tr><td>הכנסה שנתית משוערת (שנה 1)</td><td>~9,161 ₪</td><td class="advantage">~10,762 ₪ *</td><td>~8,806 ₪</td><td class="future-cell">—</td></tr>
+<tr><td>תקופת החזר משוערת</td><td>~7.1 שנים</td><td class="advantage">~6.0 שנים *</td><td class="advantage">~6.6 שנים</td><td class="future-cell">—</td></tr>
+<tr><td>רווח נקי ל-25 שנה</td><td>~157,031 ₪</td><td class="advantage">~197,000 ₪ *</td><td>~151,540 ₪</td><td class="future-cell">—</td></tr>
+<tr><td>תעריף בסיס</td><td>0.48 ₪/kWh</td><td>0.48 ₪/kWh</td><td>0.48 ₪/kWh</td><td class="future-cell">—</td></tr>
+
+<!-- What's included -->
+<tr class="category-row"><td colspan="5">מה כלול במחיר</td></tr>
+<tr><td>מערכת שטיפה</td><td class="advantage">אוטומטית (Solar Clean) — כלולה</td><td>ערכה ידנית בלבד (Green Brush, שווי 2,290 ₪)</td><td>לא כלולה (אופציה: ~6,000 ₪)</td><td class="future-cell">—</td></tr>
+<tr><td>אגרות חח"י + תצ"א</td><td class="advantage">כלול</td><td>לא צוין</td><td>כלול (במחיר המערכת)</td><td class="future-cell">—</td></tr>
+<tr><td>מנהל פרויקט אישי</td><td class="advantage">כלול</td><td>לא צוין</td><td>לא צוין</td><td class="future-cell">—</td></tr>
+<tr><td>הזזת מזגנים/דודים/קולטים</td><td class="concern">לא כלול</td><td>לא צוין</td><td>לא צוין</td><td class="future-cell">—</td></tr>
+<tr><td>חיבור WiFi לממיר</td><td>500 ₪ נוסף</td><td>לא צוין</td><td>לא צוין</td><td class="future-cell">—</td></tr>
+
+<!-- Warranty -->
+<tr class="category-row"><td colspan="5">אחריות ושקט נפשי</td></tr>
+<tr><td>אחריות קבלן מלאה (טיב התקנה)</td><td>10 שנים (120 חודשים)</td><td>10 שנים</td><td>10 שנים</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות יצרן — חומרה (מוצר)</td><td>25 שנים</td><td>15 שנים (AIKO)</td><td class="advantage">25 שנים (TADIRAN)</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות יצרן — תפוקת פאנלים</td><td>30 שנים</td><td>25 שנים</td><td>30 שנים</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות ממיר</td><td>12 שנים (הרחבה ל-25)</td><td>12 שנים</td><td>12 שנים</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות אופטימייזרים</td><td>25 שנים</td><td>25 שנים</td><td>25 שנים</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות תפוקת המערכת (מהחברה)</td><td>3 שנים (פיצוי כספי + הקדמה)</td><td>10 שנים</td><td class="concern">אין — רק אחריות יצרן על פאנלים</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות תפוקה — סף פיצוי</td><td class="advantage">סטייה מעל 5%</td><td class="concern">סטייה מעל 10%</td><td class="concern">לא רלוונטי (אין אחריות חברה)</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות תפוקה — תנאי</td><td class="advantage">ללא תנאי נוסף — אוטומטי</td><td class="concern">רק עם חוזה תחזוקה חיצוני בתשלום</td><td class="concern">ניקוי על הלקוח; ירידה בגלל לכלוך/הצללה — לא באחריות</td><td class="future-cell">—</td></tr>
+<tr><td>אחריות איטום גג</td><td>לא צוין במפורש</td><td>לא צוין</td><td class="concern">שנה אחת בלבד (1)</td><td class="future-cell">—</td></tr>
+<tr><td>תקרת אחריות כספית</td><td>מחצית מהתמורה</td><td>לא צוין</td><td class="concern">100,000 ₪ מצטבר</td><td class="future-cell">—</td></tr>
+<tr><td>ניטור (ללא קשר לחוזה תחזוקה)</td><td>3 שנים — יומי + דוח חודשי</td><td class="advantage">10 שנים</td><td class="advantage">10 שנים (מותנה באינטרנט)</td><td class="future-cell">—</td></tr>
+<tr><td>זמן תגובה — תקלה משביתה</td><td>מפורט בהסכם (לפי חומרה)</td><td>לא צוין</td><td>3 ימי עסקים (בפועל מהיר יותר)</td><td class="future-cell">—</td></tr>
+<tr><td>זמן תגובה — תקלה לא משביתה</td><td>מפורט בהסכם (לפי חומרה)</td><td>לא צוין</td><td class="concern">10 ימי עסקים</td><td class="future-cell">—</td></tr>
+<tr><td>מוקד שירות</td><td>*8121 / ווטסאפ / מייל (א–ה 9–17)</td><td>לא צוין</td><td>072-2506205 שלוחה 205 (א–ה 8:30–17:30)</td><td class="future-cell">—</td></tr>
+
+<!-- Company -->
+<tr class="category-row"><td colspan="5">פרופיל חברה</td></tr>
+<tr><td>ותק בשוק</td><td>מאז 2017 (~9 שנים)</td><td>מאז 2016 (~10 שנים)</td><td>מאז 2009 (~17 שנים)</td><td class="future-cell">מאז 1996 (~30 שנים)</td></tr>
+<tr><td>גודל חברה (עובדים)</td><td class="advantage">~100–200 עובדים</td><td>~30–50 (כולל 30+ מתקינים)</td><td class="advantage">חלק מקבוצת כלמוביל (~880 עובדים)</td><td class="future-cell">—</td></tr>
+<tr><td>דירוג Easy</td><td class="advantage">9.5/10 (551 ביקורות)</td><td>8.3 (~37 ביקורות)</td><td class="neutral">אין ציון מרכזי</td><td class="future-cell">אין ציון</td></tr>
+<tr><td>גיבוי פיננסי</td><td>גיוס 40M ₪ (2022), שותפות EDF Renewables</td><td>חברה עצמאית</td><td class="advantage">קבוצת כלמוביל (יבואנית רכב מובילה)</td><td class="future-cell">מוכרת לבנקים</td></tr>
+<tr><td>נתח שוק / היקף</td><td class="advantage">~35% שוק ביתי, ~2,600 פרויקטים, 50+ MW</td><td>500+ לקוחות, 10,000+ פאנלים</td><td>5,500+ מערכות ביתיות</td><td class="future-cell">—</td></tr>
+<tr><td>התמחות</td><td>ביתי + מוניציפלי</td><td>ביתי + משקי</td><td>ביתי + מסחרי + יזמי</td><td class="future-cell">מסחרי + ביתי</td></tr>
+<tr><td>הסכם מפורט</td><td class="advantage">חוזה 18 עמודים + 6 נספחים</td><td class="concern">תנאים מצ'אט בלבד</td><td>הסכם 7 עמודים + מצפן קוטש</td><td class="future-cell">—</td></tr>
+</tbody>
+</table>
+<p style="font-size:0.8rem; color: var(--text-secondary); margin-top:8px;">* נתוני ייצור קדמה חושבו על בסיס תחזית קדמה הרשמית (27 × 650W = 27,122 kWh/שנה, 1,545 kWh/kWp), בהתאמה ל-20 פאנלים של 670W (13.4 kWp). <strong>שימו לב:</strong> התחזית בוססה על פאנלים של 650W, בעוד שההצעה הסופית כוללת 670W — כלומר ההערכה <strong>שמרנית</strong>, והייצור בפועל צפוי להיות שווה או גבוה יותר. יחס הייצור של קדמה (1,545 kWh/kWp) גבוה ב-5–8% מוולטה (1,468) ומכלמוביל (1,433) — ייתכן הבדל במתודולוגיית החישוב או בהנחות שעות שמש (1,561).</p>
+<p style="font-size:0.8rem; color: var(--text-secondary); margin-top:4px;">** שורת "מחיר בסיס — ללא שטיפה אוטומטית": בוולטה מנוכים <strong>5,500 ₪</strong> (עלות מדויקת למערכת השטיפה האוטומטית מההצעה) מ-65,113 ₪ → 59,613 ₪. קדמה וכלמוביל — המחיר כבר ללא מערכת שטיפה אוטומטית. השורה שמתחת מפרטת עלות/שווי של מה שמוצע בכל חברה. <strong>חשוב:</strong> ויתור על שטיפה אוטומטית עלול לבטל אחריות תפוקה אצל <strong>וולטה</strong> (חוזה מתנה אחריות בניקוי לפי הנחיות). אצל <strong>קדמה</strong> — אחריות תפוקה ממילא מותנית בחוזה תחזוקה חיצוני בתשלום.</p>
+</div>
+</div>
+</section>
+
+<!-- ====== WARRANTY DEEP DIVE ====== -->
+<section id="warranty" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-warranty">
+  <span class="report-collapsible__title">ניתוח אחריות ושקט נפשי</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-warranty">
+<div class="card">
+  <p>בהתאם לעדיפויות שצוינו — <strong>אמינות ארוכת שנים, שקט נפשי, שלא תצטרך לרדוף אחרי זכויותיך</strong> — להלן ניתוח מעמיק של ההבדלים:</p>
+
+  <h3>סיכום אחריות — השוואה מלאה</h3>
+  <table class="comparison-table">
+    <thead><tr><th>היבט</th><th style="background: var(--volta-color);">וולטה</th><th style="background: var(--kedma-color);">קדמה</th><th style="background: var(--calmobile-color);">כלמוביל</th></tr></thead>
+    <tbody>
+      <tr><td>אחריות קבלן מלאה</td><td>10 שנים</td><td>10 שנים</td><td>10 שנים</td></tr>
+      <tr><td>אחריות יצרן — חומרה</td><td class="advantage">25 שנים</td><td>15 שנים</td><td class="advantage">25 שנים (TADIRAN)</td></tr>
+      <tr><td>אחריות יצרן — תפוקת פאנלים</td><td class="advantage">30 שנים</td><td>25 שנים</td><td class="advantage">30 שנים</td></tr>
+      <tr><td>אחריות ממיר</td><td>12 שנים (הרחבה ל-25)</td><td>12 שנים</td><td>12 שנים</td></tr>
+      <tr><td>אחריות אופטימייזרים</td><td>25 שנים</td><td>25 שנים</td><td>25 שנים</td></tr>
+      <tr><td>אחריות תפוקת מערכת (מהחברה)</td><td>3 שנים (פיצוי כספי + הקדמה)</td><td class="advantage">10 שנים</td><td class="concern">אין — רק אחריות יצרן על פאנלים</td></tr>
+      <tr><td>סף פיצוי על תפוקה</td><td class="advantage">סטייה > 5%</td><td>סטייה > 10%</td><td class="concern">לא רלוונטי</td></tr>
+      <tr><td>תנאי מקדים לפיצוי</td><td class="advantage">אין — אוטומטי</td><td class="concern">חוזה תחזוקה חיצוני בתשלום</td><td class="concern">ניקוי על הלקוח; ירידה מלכלוך/הצללה לא באחריות</td></tr>
+      <tr><td>מנגנון פיצוי</td><td class="advantage">כספי, כולל הקדמה לעתיד (פיצוי ×23)</td><td>כספי, שנתי</td><td class="concern">—</td></tr>
+      <tr><td>אחריות איטום גג</td><td>לא צוין במפורש</td><td>לא צוין</td><td class="concern">שנה אחת בלבד</td></tr>
+      <tr><td>תקרת אחריות כספית</td><td>מחצית מהתמורה</td><td>לא צוין</td><td class="concern">100,000 ₪ מצטבר</td></tr>
+      <tr><td>ניטור</td><td>3 שנים — יומי + דוח חודשי</td><td class="advantage">10 שנים</td><td class="advantage">10 שנים (מותנה באינטרנט)</td></tr>
+      <tr><td>SLA — תקלה משביתה</td><td>מפורט בהסכם (לפי חומרה)</td><td>לא צוין</td><td>3 ימי עסקים</td></tr>
+      <tr><td>SLA — תקלה לא משביתה</td><td>מפורט בהסכם (לפי חומרה)</td><td>לא צוין</td><td class="concern">10 ימי עסקים</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>נקודה למחשבה — אחריות תפוקה:</strong> מודל האחריות של וולטה נוח יותר ללקוח — הם מנטרים, אם יש בעיה הם מפצים, בלי שתצטרך לרכוש שירות נוסף. קדמה דורשת חוזה תחזוקה חיצוני. <strong>כלמוביל — ניתוח ההסכם המלא (7 עמודים) מאשר שאין אחריות תפוקה ייעודית מהחברה כלל.</strong> סעיף 12 בהסכם קובע במפורש שניקוי הפאנלים הוא באחריות הלקוח, והחברה לא אחראית לירידה בהספק כתוצאה מלכלוך או הצללות.
+  </div>
+
+  <h3>שטיפה ותחזוקה</h3>
+  <p><strong>וולטה</strong> כוללת מערכת שטיפה אוטומטית (Solar Clean) שמותקנת על הגג. עליך להפעיל אותה 3 פעמים בשבוע באפריל–נובמבר ופעם בשבוע בדצמבר–מרץ. נקודת מים על הגג — באחריותך.</p>
+  <p><strong>קדמה</strong> מספקת ערכת שטיפה ידנית (Green Brush) בשווי 2,290 ₪. אין אופציה למערכת שטיפה אוטומטית מקדמה — שטיפה ידנית בלבד.</p>
+  <p><strong>כלמוביל</strong> — לא כלולה מערכת שטיפה. ניתן להוסיף מערכת אוטומטית ב-~6,000 ₪, אך היועץ של כלמוביל עצמו המליץ לוותר עליה ולשטוף ידנית פעמיים בשנה — עקב עלויות מים ותחזוקת המערכת.</p>
+
+  <h3>הסכם חוזי</h3>
+  <p><strong>וולטה</strong> סיפקה הסכם מפורט בן 18 עמודים עם 6 נספחים, הכולל: מפרט מערכת, נספח בטיחות, אמנת שירות מפורטת, נספח תחזוקה ותפוקות, נספח ביטוח, ונוהל בדיקות. יש תנאי ביטול, דמי איחור הדדיים (5 ₪/kW/יום), ותהליך מוגדר.</p>
+  <p><strong>קדמה</strong> — כל המידע שהתקבל עד כה הוא מתוך שיחת ווטסאפ. טרם התקבל הסכם רשמי.</p>
+  <details>
+    <summary>כלמוביל — ניתוח הסכם מלא (7 עמודים) ⚠️</summary>
+    <p>ההסכם המלא התקבל ונותח. להלן הממצאים החשובים:</p>
+    <p><strong>✅ חיוביים:</strong></p>
+    <ul>
+      <li>הסכם מסודר ומפורט (7 עמודים) עם תכולת פרויקט, אבני דרך לתשלום, תנאי ביטול וביטוח.</li>
+      <li>אחריות התקנה 10 שנים, ניטור 10 שנים.</li>
+      <li>אגרות חח"י כלולות במחיר. בדיקת בודק מוסמך כלולה.</li>
+      <li>אחריות יצרן על ציוד עיקרי מסופקת דרך כלמוביל (גב לגב).</li>
+      <li>אפשרות מימון דרך קבוצת כלמוביל (שתי אופציות).</li>
+      <li>SLA מוגדר: 3 ימי עסקים לתקלה משביתה, 10 לתקלה רגילה.</li>
+    </ul>
+    <p><strong>⚠️ דגלים צהובים:</strong></p>
+    <ul>
+      <li><strong>אין אחריות תפוקה מהחברה</strong> — סעיף 12 קובע שניקוי פאנלים באחריות הלקוח. אין מנגנון פיצוי על ירידת ייצור. רק אחריות יצרן על תפוקת פאנלים (30 שנה).</li>
+      <li><strong>מפרט ציוד גמיש</strong> — ההסכם כותב "פאנלים Tier1 בהספק המתאים... מתוך מגוון הספקים בהתאם למלאי החברה". כלומר החברה <strong>לא מחויבת</strong> ספציפית לתדיראן — יכולה להחליף לכל Tier1 אחר.</li>
+      <li><strong>ההספק הוא הערכה בלבד</strong> — ההסכם מציין ש-12 kWp הוא הערכה ושההספק הסופי ייקבע אחרי תכנון מפורט. שינוי בהספק יגרור שינוי במחיר.</li>
+      <li><strong>איטום — שנה אחת בלבד</strong> (סעיף 9) — מרגע חיבור לרשת החשמל.</li>
+      <li><strong>תקרת אחריות כספית — 100,000 ₪ מצטבר</strong> (סעיף 10) — נמוך יחסית; אצל וולטה התקרה היא מחצית מהתמורה (~32,500 ₪).</li>
+      <li><strong>אין דמי איחור הדדיים</strong> — בניגוד לוולטה (5 ₪/kW/יום לכל צד), אין מנגנון פיצוי ללקוח על עיכוב.</li>
+      <li><strong>בעלות</strong> — המערכת נשארת של החברה עד לתשלום מלא. החברה יכולה לנתק/לפרק אם לא שולם.</li>
+      <li><strong>ביטול</strong> — לאחר סקר אתר: הלקוח מחויב לשלם לפי אבן הדרך. ביטול מסיבות חיצוניות: החזר מקדמה בניכוי 2,500 ₪.</li>
+      <li><strong>כדאיות כלכלית</strong> — סעיף 9 קובע במפורש: "החברה אינה אחראית לכדאיות הכלכלית של הלקוח בקשר עם רכישת המערכת".</li>
+    </ul>
+    <p><strong>❌ חסרים בהשוואה לוולטה:</strong></p>
+    <ul>
+      <li>אין אחריות תפוקה מהחברה (וולטה — 3 שנים אוטומטית עם פיצוי כספי).</li>
+      <li>אין מערכת שטיפה כלולה (וולטה כוללת Solar Clean ב-5,500 ₪).</li>
+      <li>אין דמי איחור הדדיים (וולטה — 5 ₪/kW/יום לשני הצדדים).</li>
+      <li>אין מחויבות לדגם פאנל ספציפי (וולטה — "תדיראן 600W או שווה ערך Tier1").</li>
+      <li>אין תחזית תפוקה חתומה כחלק מההסכם (רק במסמך "מצפן קוטש" נפרד).</li>
+    </ul>
+  </details>
+</div>
+</div>
+</section>
+
+<!-- ====== INTERACTIVE FINANCIAL SIMULATOR ====== -->
+<section id="financial" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-financial">
+  <span class="report-collapsible__title">סימולטור פיננסי אינטראקטיבי</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-financial">
+<div class="card">
+  <p>שנה את הפרמטרים למטה כדי לראות כיצד הם משפיעים על הכדאיות הכלכלית של כל הצעה:</p>
+  <p style="font-size:0.88rem; color:var(--text-secondary); max-width:900px; line-height:1.6;"><strong>איך מחושבת «הכנסה» מצריכה עצמית:</strong> כל קוט"ש שאתם צורכים ישירות מהמערכת (במקום מהרשת) נספר כחיסכון לפי <strong>0.64 ₪/kWh</strong> — כלומר מה שהייתם משלמים בחשבון החשמל (תעריף קמעונאי ממוצע). קוט"ש שמוזרמים לרשת נספרים לפי תעריף הניטור הנטו (התרחיש שבחרת למטה). כך מתייחסים נכון גם ל־64 אגורות לקוט"ש שנחסך.</p>
+
+  <div class="controls-row">
+    <div class="control-group">
+      <label>צריכה חודשית ביתית (kWh)</label>
+      <input type="range" id="consumptionSlider" min="200" max="2500" value="500" step="50">
+      <span class="range-value" id="consumptionValue">500 kWh</span>
+    </div>
+    <div class="control-group">
+      <label>% צריכה בשעות היום</label>
+      <input type="range" id="daytimeSlider" min="30" max="80" value="60" step="5">
+      <span class="range-value" id="daytimeValue">60%</span>
+    </div>
+    <div class="control-group">
+      <label>תרחיש תעריף</label>
+      <select id="tariffSelect">
+        <option value="current">נוכחי — 0.48 ₪ קבוע ל-25 שנה</option>
+        <option value="option1">אופציה 1 — 0.60 ₪ ל-5 שנים, אח"כ 0.38 ₪</option>
+        <option value="option2">אופציה 2 — 0.39 ₪ + הצמדה למדד</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <button class="toggle-btn active" id="toggleVolta" style="border-color: var(--volta-color); background: var(--volta-color);" onclick="toggleCompany('volta')">וולטה סולאר</button>
+    <button class="toggle-btn active" id="toggleKedma" style="border-color: var(--kedma-color); background: var(--kedma-color);" onclick="toggleCompany('kedma')">קדמה סולאר</button>
+    <button class="toggle-btn active" id="toggleCalmobile" style="border-color: var(--calmobile-color); background: var(--calmobile-color);" onclick="toggleCompany('calmobile')">כלמוביל Energy</button>
+    <button class="toggle-btn" id="toggleSolarfield" style="border-color: var(--solarfield-color); color: var(--solarfield-color);" onclick="toggleCompany('solarfield')" disabled title="טרם התקבלה הצעה">סולארפילד</button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid" id="financialCards">
+    <!-- Populated by JS -->
+  </div>
+
+  <!-- Charts -->
+  <h3>נקודת איפוס — מתי עוברים לרווח?</h3>
+  <div class="chart-container" style="height: 400px;">
+    <canvas id="breakevenChart"></canvas>
+  </div>
+
+  <div class="chart-row">
+    <div>
+      <h3>הכנסה שנתית</h3>
+      <div class="chart-container" style="height: 350px;">
+        <canvas id="annualIncomeChart"></canvas>
+      </div>
+    </div>
+    <div>
+      <h3>ייצור חודשי לעומת צריכה</h3>
+      <div class="chart-container" style="height: 350px;">
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ====== INDEPENDENT RESEARCH ====== -->
+<section id="research" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-research">
+  <span class="report-collapsible__title">רקע שוק וחברות</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-research">
+<div class="card">
+  <h3>מטרת הסעיף</h3>
+  <p>כאן מוצג רקע שוק על החברות והקשר רגולטורי. ניתוח הפאנלים המלא הועבר לסוף הדוח תחת <strong>״השוואת פאנלים מפורטת״</strong> כדי לשמור על זרימה ברורה: חברה → כלכלה → פרגולה → פאנלים → שאלות.</p>
+
+  <h3>פרופיל חברות</h3>
+  <details>
+    <summary>וולטה סולאר — פרימיום בשוק הביתי (פרופיל מורחב)</summary>
+    <p><strong>רקע:</strong> חברה ישראלית ציבורית שהוקמה ב-2017 על ידי <strong>ערן טל</strong> (מייסד ומנכ"ל) ו<strong>טל הרכבי</strong> (מייסד וסמנכ"ל עסקים). מעסיקה <strong>~100–200 עובדים</strong>. מתמקדת בגגות פרטיים, מסחריים ומוניציפליים.</p>
+    <p><strong>נתח שוק:</strong> מחזיקה ב<strong>~35% משוק הגגות הביתיים</strong> בישראל — שיעור חריג לשוק מפוצל. הקימה <strong>~2,600 פרויקטים</strong> בהספק מצטבר של <strong>50+ MW</strong>.</p>
+    <p><strong>גיוסי הון:</strong> ב-2022 גייסה <strong>40 מיליון ₪</strong> (כ-12.4M$). בית ההשקעות More השקיע 30M ₪ תמורת 20% ממניות החברה; יתרת 10M ₪ הגיעה ממשקיע הפרטי <strong>אייל וולדמן</strong> (שותף מייסד של Mellanox, שנמכרה ל-NVIDIA) ובכירים מ-NVIDIA.</p>
+    <p><strong>שותפויות:</strong> <strong>EDF Renewables</strong> (ענקית אנרגיה צרפתית, 137GW עולמיים) — שותפות ליזמות ומימון מערכות על גגות מסחריים-תעשייתיים ומוניציפליים במודל ליסינג סולארי. שותפות עם EV-Edge (עמדות טעינה).</p>
+    <p><strong>לקוחות:</strong> שפיר הנדסה, שיכון ובינוי, רשת תחנות דלק Ten, מועצה אזורית מגידו, ועוד.</p>
+    <p><strong>כיוון אסטרטגי:</strong> מרחיבה לאגירת אנרגיה (סוללות ליתיום-יון) ומכירת חשמל ישירות — שמים לב לכיוון של חברת אנרגיה ולא רק מתקין.</p>
+    <p><strong>דירוג ומוניטין:</strong> 9.5/10 ב-Easy (551 ביקורות) — מהגבוהים בענף. מופיעה כמובילה בכל מדריכי השוק. ביקורות מדגישות שקיפות, ליווי אישי, וחוזה מפורט.</p>
+    <p><strong>חוזקות:</strong> שחקן ראשי בשוק, גיבוי פיננסי חזק (גיוסים + EDF), חוזה המפורט ביותר (18 עמודים + 6 נספחים), מותג חזק וביקורות מצוינות.</p>
+    <p><strong>חולשות:</strong> המחיר הגבוה ביותר מבין השלוש (65,076 ₪), אין אחריות תפוקה ייעודית מהחברה, דגרדציה מוצהרת גבוהה יחסית.</p>
+  </details>
+  <details>
+    <summary>קדמה סולאר — בוטיק מקצועי (פרופיל מורחב)</summary>
+    <p><strong>רקע:</strong> הוקמה ב-2016 על ידי שלושה מייסדים אמריקאים-ישראלים: <strong>נח ברמן</strong> (מנכ"ל), <strong>עזרא לבנדה</strong> (מנהל טכני), ו<strong>שטרן טיגלר</strong> (סמנכ"ל תפעול). רקע בבנייה וגרינטק, בוגרי אוניברסיטאות מובילות בארה"ב.</p>
+    <p><strong>גודל:</strong> <strong>~30–50 עובדים</strong> כולל 30+ מתקינים מוסמכים ב-3 צוותי התקנה פעילים, מהנדסי חשמל ובנייה, יועצים סולאריים, צוות לוגיסטיקה, ומנהלי פרויקטים. חברה "בוטיק" — קטנה אך ממוקדת.</p>
+    <p><strong>היקף:</strong> <strong>500+ לקוחות</strong>, <strong>10,000+ פאנלים</strong> הותקנו. פרויקטים משמעותיים: אקדמיית משטרה (600KW, בית שמש), מפעלי עין שמר (800KW), מפעל Palace (830KW, באר שבע), בניין מכס (2,400KW, נתב"ג).</p>
+    <p><strong>מודל ייחודי — רכישה קבוצתית:</strong> מפעילה תוכנית "קבוצת רכישה" ליישובים — למשל 20 משפחות בשורשים (200KW), 21 משפחות בגבעת חיים (350KW). מאפשרת מחירי סיטונאי לבתים פרטיים.</p>
+    <p><strong>דירוג:</strong> TrustIndex 4.7/5. ביקורות מציינות שירות אישי, צוותים מקצועיים קבועים, ונכונות לתקן בעיות גם לאחר תשלום. הדירוג נמוך יותר מוולטה בכמות הביקורות (37 לעומת 551).</p>
+    <p><strong>אחריות תפוקה:</strong> מציעה פיצוי על חריגה מעל 10% מהייצור הצפוי — <strong>בתנאי שיש חוזה תחזוקה</strong> עם חברה מתמחה. ללא חוזה — אין החזר. כוללת ערכת שטיפה ידנית (בשווי 2,290 ₪) לניקוי עצמי.</p>
+    <p><strong>חוזקות:</strong> המחיר הזול ביותר ל-kWp (4,849 ₪), פאנל AIKO 670W עם ההספק הגבוה ביותר, אחריות תפוקה (בתנאים), גישה אישית ומקצועית.</p>
+    <p><strong>חולשות:</strong> חברה קטנה (פחות ביטחון לטווח ארוך), תנאי ההסכם סוכמו בצ'אט בלבד (ללא חוזה מפורט), אחריות תפוקה מותנית בחוזה תחזוקה חיצוני, גיבוי פיננסי חלש ביחס לשתי האחרות.</p>
+  </details>
+  <details>
+    <summary>כלמוביל Energy — תאגיד גדול ויציב (ניתוח מעמיק)</summary>
+    <p><strong>רקע:</strong> זרוע האנרגיה הסולארית של קבוצת כלמוביל — יבואנית הרכב המובילה בישראל. פעילה בתחום הסולארי מ-2009, מהשנים הראשונות של פתיחת השוק הסולארי בישראל. אלפי מערכות גגות הותקנו, כולל פרויקטים גדולים (למשל מושב מכורה: 7 סככות, 14,000 מ"ר, 2.1MW, הכנסות צפויות של 1.6 מיליון ₪/שנה ל-25 שנה).</p>
+    <p><strong>יציבות פיננסית:</strong> כחלק מקבוצת כלמוביל, לחברה גב פיננסי משמעותי ונגישות טובה לאשראי בנקאי. זוכה במכרזים גדולים למערכות סולאריות ביתיות — מה שמעיד על יכולת ביצוע ואמינות תאגידית.</p>
+    <p><strong>מודל הפעלה:</strong> One-stop-shop — ייעוץ, תכנון, רישוי, התקנה, חיבור לרשת, ותחזוקה. מחלקת שירות ארצית. ניסיון רב בפרויקטים של "רכישה קבוצתית" (מושבים, יישובים, קיבוצים).</p>
+    <p><strong>חוזקות:</strong> ותק ארוך בשוק (17 שנה), גיבוי תאגידי חזק, מחיר תחרותי (58,339 ₪ — הזול ביותר), תחזית כלכלית מפורטת (מצפן קוטש), אחריות יצרן תדיראן 25 שנה על מוצר + 30 שנה על תפוקה, SLA מוגדר (72 שעות), ניטור 10 שנים.</p>
+    <p><strong>חולשות (מאושרות מההסכם):</strong> אין ציון ב-Easy. <strong>אין אחריות תפוקה מהחברה</strong> (רק אחריות יצרן). מפרט ציוד גמיש (לא מחויבים לתדיראן ספציפית). איטום — שנה אחת בלבד. תקרת אחריות כספית 100K ₪. אין דמי איחור הדדיים. מערכת שטיפה לא כלולה. החברה לא אחראית לכדאיות כלכלית.</p>
+    <p><strong>תובנות מהפגישה (19.4.2026):</strong> היועץ ציין שיש להם SLA של 72 שעות אך בפועל זה מהיר יותר. המליץ נגד מערכת שטיפה אוטומטית (חיסכון ב-6K ₪). הזהיר מפני פאנלים ב"גדלים ביניים" (כמו 670W) בשל בעיות זמינות עתידיות. הציע אלטרנטיבת ממיר Sungrow שמוזילה את המחיר ל-55K ₪ (גג בלבד) או 60K ₪ (עם פרגולה).</p>
+  </details>
+  <details>
+    <summary>סולארפילד — הוותיקה בשוק</summary>
+    <p>הוקמה ב-1996, מהחברות הוותיקות ביותר בתחום תשתיות החשמל בישראל. החלה פעילות בפוטו-וולטאי ב-2009, הרחיבה למערכות ביתיות ב-2018. מוכרת לבנקים, ניסיון רב בפרויקטים מורכבים. פחות נוכחות בדירוגים צרכניים אונליין, אך מוערכת בקרב אנשי מקצוע.</p>
+  </details>
+
+  <h3>תעריף חשמל סולארי — מצב נוכחי ושינויים צפויים</h3>
+  <p>התעריף הנוכחי למערכות ביתיות (עד 15 kW): <strong>0.48 ₪/kWh קבוע ל-25 שנה</strong>. משרד האנרגיה פרסם להערות הציבור שני מודלים חדשים (ראה <a href="#tariff">נספח תעריפים</a>). מערכת שנחתמת על התעריף הנוכחי לפני שינוי — נשארת על 0.48 ₪.</p>
+</div>
+</div>
+</section>
+
+<!-- ====== PERGOLA ====== -->
+<section id="pergola" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-pergola">
+  <span class="report-collapsible__title">אופציית פרגולה (נפרד מהגג הראשי)</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-pergola">
+<div class="card">
+  <h3>טבלת השוואת פרגולה — שלוש חברות</h3>
+  <div class="table-wrapper">
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th style="width:22%">פרמטר</th>
+        <th style="width:26%">🔵 וולטה סולאר</th>
+        <th style="width:26%">🟢 קדמה סולאר</th>
+        <th style="width:26%">🟠 כלמוביל Energy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="category-row"><td colspan="4">מפרט טכני</td></tr>
+      <tr><td>סוג פאנלים</td><td>APOLLO 310W — גמישים, מודבקים</td><td>AIKO 670W — סטנדרטיים</td><td>Tadiran 600W — סטנדרטיים</td></tr>
+      <tr><td>מספר פאנלים</td><td>7</td><td>5</td><td>5</td></tr>
+      <tr><td>הספק כולל</td><td>2.17 kWp</td><td class="advantage">3.35 kWp</td><td>3.0 kWp</td></tr>
+      <tr><td>דגרדציה שנתית</td><td class="concern">0.56%</td><td class="advantage">0.35%</td><td>0.4%</td></tr>
+      <tr><td>קונסטרוקציה נדרשת</td><td class="advantage">לא — פאנלים מודבקים</td><td>כן</td><td>כן</td></tr>
+
+      <tr class="category-row"><td colspan="4">כלכלה</td></tr>
+      <tr><td>עלות תוספת</td><td class="concern">11,935 ₪</td><td>10,529 ₪</td><td class="advantage">~5,361 ₪</td></tr>
+      <tr><td>עלות ל-kWp</td><td class="concern">5,499 ₪/kWp</td><td>3,143 ₪/kWp</td><td class="advantage">1,787 ₪/kWp</td></tr>
+      <tr><td>ייצור שנתי צפוי (שנה 1)</td><td>~3,038 kWh</td><td class="advantage">~5,177 kWh</td><td>~4,100 kWh</td></tr>
+      <tr><td>הכנסה שנתית (שנה 1, 0.48 ₪)</td><td>~1,458 ₪</td><td class="advantage">~2,485 ₪</td><td>~1,968 ₪</td></tr>
+      <tr><td>תקופת החזר משוערת</td><td class="concern">~8.2 שנים</td><td>~4.2 שנים</td><td class="advantage">~2.7 שנים</td></tr>
+      <tr><td>רווח נקי ל-25 שנה (הערכה)</td><td>~22,000 ₪</td><td class="advantage">~47,000 ₪</td><td>~40,000 ₪</td></tr>
+      <tr><td>אלטרנטיבת Sungrow</td><td>—</td><td>—</td><td>~5,000 ₪ (60K כולל הכל)</td></tr>
+
+      <tr class="category-row"><td colspan="4">אחריות ושירות</td></tr>
+      <tr><td>אחריות תפוקה</td><td class="concern">לא כלולה (פאנלים גמישים)</td><td>מותנית בחוזה תחזוקה</td><td>אחריות יצרן (תדיראן 30 שנה)</td></tr>
+      <tr><td>ניטור</td><td>כלול במערכת SolarEdge</td><td>10 שנים</td><td>10 שנים</td></tr>
+
+      <tr class="category-row"><td colspan="4">יתרונות וחסרונות</td></tr>
+      <tr>
+        <td>יתרונות</td>
+        <td>✅ מראה אסתטי ונקי<br>✅ בלי קונסטרוקציה<br>✅ התקנה פשוטה וקלה</td>
+        <td>✅ ההספק הגבוה ביותר (3.35 kWp)<br>✅ הייצור הגבוה ביותר<br>✅ הרווח הגבוה ביותר ל-25 שנה</td>
+        <td>✅ העלות הנמוכה ביותר<br>✅ החזר מהיר ביותר<br>✅ פאנל מוכח ונפוץ<br>✅ אופציית Sungrow זולה</td>
+      </tr>
+      <tr>
+        <td>חסרונות</td>
+        <td>❌ הכי יקר ל-kWp (x3 מכלמוביל)<br>❌ ייצור נמוך (2.17 kWp בלבד)<br>❌ דגרדציה גבוהה יחסית<br>❌ אין אחריות תפוקה</td>
+        <td>❌ דורש קונסטרוקציה<br>❌ עלות הערכה (לא סופית)<br>❌ אחריות תפוקה מותנית</td>
+        <td>❌ דורש קונסטרוקציה<br>❌ הספק נמוך יותר מקדמה</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:0.8rem; color: var(--text-secondary); margin-top:8px;">עלות קדמה לפרגולה: הפרש בין הצעה ל-25 פאנלים (75,500 ₪) לבין 20 פאנלים (64,971 ₪) = 10,529 ₪ עבור 5 פאנלים. ייצור מבוסס תחזית קדמה (1,545 kWh/kWp).</p>
+
+  <div class="insight-box">
+    <strong>שורה תחתונה — פרגולה:</strong><br>
+    <strong>מבחינה כלכלית</strong> — כלמוביל מובילה עם העלות הנמוכה ביותר (5,361 ₪) והחזר מהיר ביותר (~2.7 שנים). קדמה מספקת את הייצור הגבוה ביותר (5,177 kWh) ואת הרווח הגבוה ביותר ל-25 שנה (~47K ₪), אך במחיר כפול מכלמוביל (10,529 ₪).<br>
+    <strong>מבחינה אסתטית</strong> — וולטה מנצחת עם פאנלים גמישים שמודבקים ישירות ללא קונסטרוקציה, אבל המחיר הגבוה ביותר (11,935 ₪) עם הייצור הנמוך ביותר.<br>
+    <strong>המלצה:</strong> <strong>כלמוביל</strong> — היחס הטוב ביותר בין מחיר לייצור. אם חשוב למקסם ייצור — <strong>קדמה</strong>. אם המראה קריטי — <strong>וולטה</strong>, אך בפרמיה משמעותית.
+  </div>
+
+  <h3>גרף החזר השקעה — פרגולה בלבד</h3>
+  <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:12px;">הגרף מציג <strong>רק הכנסה ממכירת חשמל לרשת</strong> (תעריף ניטור נטו), בלי חישוב של צריכה עצמית וללא 0.64 ₪/kWh — מתאים להשוואה כשהפרגולה מייצרת בעיקר בזמן שאין בבית צריכה מקבילה. משתמש באותו <strong>תרחיש תעריף</strong> כמו הסימולטור למעלה.</p>
+  <div class="chart-container" style="height: 380px; max-width: 900px;">
+    <canvas id="pergolaBreakevenChart"></canvas>
+  </div>
+
+  <div class="future-placeholder">
+    <strong>סולארפילד</strong><br>
+    הצעת פרגולה טרם התקבלה — תתווסף כאן בהמשך
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ====== FUTURE QUOTES ====== -->
+<section id="future" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-future">
+  <span class="report-collapsible__title">הצעות עתידיות</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-future">
+<div class="card">
+  <div class="tip-box">
+    <h3>כלמוביל Energy — ✓ שולבה בדוח</h3>
+    <p>הצעת מחיר התקבלה (19.4.2026). כל הנתונים שולבו בטבלת ההשוואה, בסימולטור הפיננסי, ובגרפים.</p>
+  </div>
+  <div class="future-placeholder">
+    <h3>סולארפילד</h3>
+    <p>פגישה עתידית אפשרית.</p>
+    <p>המבנה מוכן לקליטת ההצעה — כל העמודות והגרפים יתעדכנו אוטומטית.</p>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ====== PANEL COMPARISON (MOVED NEAR END) ====== -->
+<section id="panel-comparison" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-panel-comparison">
+  <span class="report-collapsible__title">השוואת פאנלים מפורטת (תדיראן 600W מול AIKO 670W)</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-panel-comparison">
+<div class="card">
+
+  <h3>תקציר מהיר</h3>
+  <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:12px;"><strong>שימו לב:</strong> וולטה וכלמוביל משתמשות באותו פאנל תדיראן 600W. ההשוואה הטכנית של הפאנלים היא בעצם AIKO 670W (קדמה) מול תדיראן 600W (וולטה + כלמוביל).</p>
+  <div class="summary-grid">
+    <div class="summary-card" style="border-top:3px solid var(--kedma-color);"><div class="value" style="color:var(--kedma-color);">670W</div><div class="label">קדמה / AIKO — הספק</div></div>
+    <div class="summary-card" style="border-top:3px solid var(--volta-color);"><div class="value" style="color:var(--volta-color);">600W</div><div class="label">וולטה + כלמוביל / תדיראן — הספק</div></div>
+    <div class="summary-card" style="border-top:3px solid var(--kedma-color);"><div class="value" style="color:var(--kedma-color);">24.8%</div><div class="label">קדמה / AIKO — נצילות</div></div>
+    <div class="summary-card" style="border-top:3px solid var(--volta-color);"><div class="value" style="color:var(--volta-color);">23.2%</div><div class="label">וולטה + כלמוביל / תדיראן — נצילות</div></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>פרמטר</th>
+        <th style="background:var(--kedma-color);">קדמה — AIKO 670W</th>
+        <th style="background:var(--volta-color);">וולטה — תדיראן 600W</th>
+        <th>הפרש עיקרי</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="panel-model-row"><td>דגם מלא (מק״ט)</td><td>AIKO COMET 3N72 — <strong>AIKO-A670-MDE72Mw</strong></td><td><strong>Tadiran DM600M10T-B72HSW</strong></td><td>לפי מפרט יצרן</td></tr>
+      <tr><td>טכנולוגיית תאים</td><td class="advantage">N-type ABC (Back Contact)</td><td>N-type Mono-crystalline</td><td class="advantage">דור מתקדם יותר ל-AIKO</td></tr>
+      <tr><td>Pmax (STC)</td><td class="advantage">670W</td><td>600W</td><td class="advantage">+70W (+11.7%)</td></tr>
+      <tr><td>נצילות מודול</td><td class="advantage">24.8%</td><td>23.2%</td><td class="advantage">+1.6 נק׳ אחוז</td></tr>
+      <tr><td>Voc / Vmp (STC)</td><td>54.50V / 45.70V</td><td>53.30V / 44.61V</td><td class="advantage">מתחים גבוהים יותר ל-AIKO</td></tr>
+      <tr><td>Isc / Imp (STC)</td><td>15.35A / 14.67A</td><td>14.23A / 13.47A</td><td class="advantage">זרמים גבוהים יותר ל-AIKO</td></tr>
+      <tr><td>הספק בתנאי NOCT</td><td class="advantage">508W</td><td>452W</td><td class="advantage">+56W (+12.4%)</td></tr>
+      <tr><td>מקדם טמפ׳ Pmax</td><td class="advantage">-0.26%/°C</td><td>-0.29%/°C</td><td class="advantage">פחות איבוד בחום ל-AIKO</td></tr>
+      <tr><td>מקדם טמפ׳ Voc</td><td class="advantage">-0.22%/°C</td><td>-0.25%/°C</td><td class="advantage">שיפור ~12%</td></tr>
+      <tr><td>דגרדציה שנה ראשונה</td><td class="advantage">≤1%</td><td>≤2%</td><td class="advantage">פי 2 לטובת AIKO</td></tr>
+      <tr><td>דגרדציה שנתית (שנה 2+)</td><td class="advantage">≤0.35%</td><td>≤0.55%</td><td class="advantage">פי ~1.6 לטובת AIKO</td></tr>
+      <tr><td>תפוקה משוערת אחרי 25 שנה</td><td class="advantage">~90.6%</td><td>~84.5%</td><td class="advantage">+6.1 נק׳ אחוז</td></tr>
+      <tr><td>תפוקה משוערת אחרי 30 שנה</td><td class="advantage">~88.85%</td><td>~81.8%</td><td class="advantage">+7.1 נק׳ אחוז</td></tr>
+      <tr><td>משקל לפאנל</td><td class="advantage">28.2 ק״ג</td><td>31.8 ק״ג</td><td class="advantage">קל ב-3.6 ק״ג</td></tr>
+      <tr><td>וואט לק״ג</td><td class="advantage">23.8</td><td>18.9</td><td class="advantage">+25.9%</td></tr>
+      <tr><td>פאנלים ל-10kWp</td><td class="advantage">~15</td><td>~17</td><td class="advantage">2 פחות</td></tr>
+      <tr><td>שטח גג ל-10kWp</td><td class="advantage">~40.3 מ״ר</td><td>~43.1 מ״ר</td><td class="advantage">חיסכון ~2.8 מ״ר</td></tr>
+      <tr><td>משקל כולל ל-10kWp</td><td class="advantage">~423 ק״ג</td><td>~541 ק״ג</td><td class="advantage">קל ב-118 ק״ג</td></tr>
+      <tr><td>אחריות מוצר (לפי מפרט יצרן)</td><td>15 שנים (ניתן להרחיב ל-25)</td><td>לא צוין במפרט</td><td>—</td></tr>
+      <tr><td>אחריות ביצועים (לפי מפרט יצרן)</td><td>30 שנים</td><td>לא צוין במפרט</td><td>—</td></tr>
+      <tr><td>שותף אחריות</td><td class="advantage">Munich RE + TÜV Rheinland</td><td>לא צוין</td><td class="advantage">כיסוי בינלאומי ל-AIKO</td></tr>
+    </tbody>
+  </table>
+  <div class="insight-box" style="margin-top: 16px;">
+    <strong>הערה חשובה:</strong> כלמוביל Energy משתמשת באותו פאנל תדיראן 600W כמו וולטה — כלומר כל הנתונים הטכניים של תדיראן בטבלה זו רלוונטיים גם להצעה של כלמוביל. ההבדל בין וולטה לכלמוביל אינו בפאנל אלא ב<strong>מחיר</strong> (כלמוביל זולה ב-6,774 ₪ במחיר המלא; בלי שטיפה אוטומטית — ~1,274 ₪), <strong>שירות</strong> (וולטה כוללת שטיפה אוטומטית ב-5,500 ₪ ואחריות תפוקה), ו<strong>פרופיל חברה</strong>.
+  </div>
+  <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">הערה: הטבלה כאן משקפת נתוני יצרן. תנאי אחריות מסחריים בפועל נקבעים לפי ההצעה והחוזה מול החברה המתקינה.</p>
+</div>
+</div>
+</section>
+
+<!-- ====== QUESTIONS FOR MEETINGS ====== -->
+<section id="questions" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-questions">
+  <span class="report-collapsible__title">שאלות לפגישות</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-questions">
+<div class="card">
+  <h3>סט שאלות בסיסי לכל חברה חדשה (חובה)</h3>
+  <ul class="question-list">
+    <li>מה ההספק המוצע לגג הראשי בלבד (kWp), וכמה פאנלים בפועל?</li>
+    <li>מה דגם מדויק של הפאנל ושל הממיר (שם יצרן + מק\"ט מלא)?</li>
+    <li>לבקש מפרט טכני מלא של הלוחות הסולאריים (Datasheet) + אישורי תקינה.</li>
+    <li>מה נצילות, דגרדציה, ומקדם טמפרטורה של הפאנל המוצע?</li>
+    <li>מה אחריות מוצר, אחריות ביצועים, אחריות ממיר ואופטימייזרים? בכתב.</li>
+    <li>מה תנאי אחריות תפוקה של החברה: סף, תקופה, תנאים לפיצוי, ואיך מחושב?</li>
+    <li>מה המחיר הכולל כולל מע\"מ, ומה מחיר ל-kWp מותקן?</li>
+    <li>מה כלול ומה לא כלול במחיר (אגרות, שינויים בגג, WiFi, שטיפה, ניטור)?</li>
+    <li>לבקש תחזית ייצור שנתית חתומה (kWh) + הנחות החישוב.</li>
+    <li>לבקש 2-3 ממליצים עדכניים בפרויקטים דומים באזור.</li>
+    <li>לבקש הסכם/חוזה מלא מראש, לפני כל חתימה או מקדמה.</li>
+  </ul>
+
+  <h3>סיכום פגישה עם כלמוביל Energy (19.4.2026)</h3>
+  <div class="tip-box">
+    <strong>תובנות מהפגישה:</strong>
+    <ul style="margin: 8px 0; padding-right: 20px; list-style: disc;">
+      <li><strong>חבילת Energy pro:</strong> 20 פאנלים תדיראן 600W, ממיר SolarEdge, 12 kWp, מחיר 58,339 ₪ כולל מע"מ ואגרות.</li>
+      <li><strong>שטיפה:</strong> ניתן להוסיף מערכת אוטומטית ב-~6K ₪. היועץ המליץ לוותר — שטיפה ידנית פעמיים בשנה מספיקה (עלויות מים ותחזוקה מיותרות).</li>
+      <li><strong>SLA:</strong> התחייבות לתיקון תוך 72 שעות, בפועל מהיר יותר.</li>
+      <li><strong>פרגולה:</strong> 5 פאנלים נוספים = 63,700 ₪ כולל (תוספת ~5,361 ₪).</li>
+      <li><strong>ממיר Sungrow:</strong> אלטרנטיבה שמוזילה ל-55K ₪ (גג בלבד) או 60K ₪ (עם פרגולה). מוריד ~3,000 ₪.</li>
+      <li><strong>פאנלים:</strong> היועץ הזהיר מפני דגמי "ביניים" (600-700W כמו 670W) — בעיה עתידית בזמינות חלפים. דגמים נפוצים כמו 600W נמכרים בכמויות ויהיו זמינים.</li>
+      <li><strong>פריסת תשלומים:</strong> מקדמה 3,000 ₪, 25% בקיזוז מקדמה עם חיבור PV, 90% לפני הגעת ציוד, 100% לפני חיבור לרשת.</li>
+    </ul>
+  </div>
+
+  <h3>שאלות שנותרו פתוחות לכלמוביל</h3>
+  <ul class="question-list">
+    <li>האם יש אחריות תפוקה ייעודית מהחברה (לא רק אחריות יצרן)? מה הסף, התנאים, והמנגנון?</li>
+    <li>לבקש הסכם חוזי מלא לעיון — כולל סעיפי ביטול, SLA מפורט, ואחריות תפוקה.</li>
+    <li>מה כלול ומה לא: WiFi לממיר, הזזת מזגנים/דודים, קונסטרוקציה לפרגולה?</li>
+    <li>האם ניתן להרחיב אחריות ממיר מעבר ל-12 שנים (כמו אפשרות וולטה ל-25)?</li>
+    <li>2-3 ממליצים של לקוחות פרטיים באזור עינת/השרון.</li>
+  </ul>
+
+  <h3>שאלות לשאול את קדמה סולאר (השלמה)</h3>
+  <ul class="question-list">
+    <li>האם ניתן לקבל תחזית ייצור רשמית למערכת 20 פאנלים של 670W?</li>
+    <li>מה עלות חוזה התחזוקה החיצוני שנדרש לצורך אחריות התפוקה? ומול איזו חברה?</li>
+    <li>האם יש אפשרות להרחבת אחריות הממיר מעבר ל-12 שנים? (כמו וולטה שמציעים הרחבה ל-25)</li>
+    <li>האם אפשר לקבל הסכם/חוזה מפורט כמו של וולטה?</li>
+    <li>מה הדגם המדויק של הפאנלים והממיר?</li>
+  </ul>
+</div>
+</div>
+</section>
+
+<!-- ====== TARIFF APPENDIX ====== -->
+<section id="tariff" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-tariff">
+  <span class="report-collapsible__title">נספח: תעריפי חשמל סולארי — מצב נוכחי ושינויים אפשריים</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-tariff">
+<div class="card">
+  <h3>התעריף הנוכחי</h3>
+  <p>מערכות ביתיות עד 15 kW: <strong>0.48 ₪/kWh</strong> קבוע ל-25 שנה. חברת החשמל משלמת עבור כל קוט"ש שמיוצר ומוזרם לרשת.</p>
+
+  <h3>שני מודלים חדשים בהתייעצות ציבורית (מרץ 2025)</h3>
+  <table class="comparison-table" style="max-width: 700px;">
+    <thead><tr><th>מאפיין</th><th>אופציה 1</th><th>אופציה 2</th></tr></thead>
+    <tbody>
+      <tr><td>תעריף התחלתי</td><td class="advantage">0.60 ₪/kWh</td><td>0.39 ₪/kWh</td></tr>
+      <tr><td>לאחר 5 שנים</td><td>0.3807 ₪/kWh</td><td>צמוד מדד (עולה)</td></tr>
+      <tr><td>מגבלת הספק</td><td>עד 15 kW (תעריף גבוה)</td><td>עד 15 kW</td></tr>
+      <tr><td>יתרון</td><td>החזר מהיר בשנים הראשונות</td><td>הגנה מפני אינפלציה</td></tr>
+      <tr><td>חיסרון</td><td>ירידה חדה אחרי 5 שנים</td><td>תעריף התחלתי נמוך</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip-box">
+    <strong>המלצה:</strong> מערכת שנחתמת היום על התעריף הנוכחי (0.48 ₪) — נשארת על תעריף זה ל-25 שנה. אם יש כוונה לחתום — עדיף לא לחכות לשינוי התעריפים. הסימולטור למעלה מאפשר להשוות את שלושת התרחישים.
+  </div>
+</div>
+</div>
+</section>
+
+<section id="final-conclusions" class="report-collapsible is-collapsed" data-collapsible>
+<button type="button" class="report-collapsible__trigger" aria-expanded="false" aria-controls="collapsible-final-conclusions">
+  <span class="report-collapsible__title">מסקנות סופיות</span>
+  <span class="report-collapsible__chev" aria-hidden="true"></span>
+</button>
+<div class="report-collapsible__panel" id="collapsible-final-conclusions">
+<div class="card">
+  <p style="font-size:0.95rem; color:var(--text-secondary); margin-bottom:16px;">להלן סיכום מהדוח המפורט להשוואת הפאנלים, יחד עם מסגרת החלטה כללית למערכת השלמה (לא רק הלוחות).</p>
+  <div class="conclusion-grid">
+    <div class="conclusion-card">
+      <strong>הספק ונצילות</strong>
+      דגם <strong>AIKO-A670-MDE72Mw</strong> (קדמה) מספק כ־70 וואט יותר ללוח (+11.7%) בנצילות <strong>24.8%</strong> לעומת 23.2% של תדיראן (וולטה). הפער נשמר גם בתנאי שטח (NOCT): 508W מול 452W — כ־12.4% יותר בתנאים אמיתיים.
+    </div>
+    <div class="conclusion-card">
+      <strong>משקל — חשוב לגג</strong>
+      לוח AIKO שוקל כ־28.2 ק״ג מול 31.8 ק״ג לתדיראן (קל בכ־11%). למערכת של כ־10 קילוואט שטח זה פחות כ־118 ק״ג על הגג — משמעותי בגגות עם מגבלת עומס.
+    </div>
+    <div class="conclusion-card">
+      <strong>חום — רלוונטי לישראל</strong>
+      מקדם Pmax של ‎-0.26%/°C‎ מול ‎-0.29%/°C‎, ומקדם Voc ‎-0.22%/‎ מול ‎-0.25%/°C‎. בימי קיץ כשהפאנל מתחמם, ה-AIKO מאבד פחות הספק; מצטבר לרוב ל־כ־1.5%–2.5% יותר ייצור שנתי (הערכה).
+    </div>
+    <div class="conclusion-card">
+      <strong>דגרדציה לטווח ארוך</strong>
+      אחרי 25 שנה AIKO נשאר עם כ־90.6% מהתפוקה המקורית, תדיראן כ־84.5%. הפער (~6%) מתרגם לאלפי קוט״ש נוספים לאורך חיי המערכת.
+    </div>
+    <div class="conclusion-card">
+      <strong>טכנולוגיית ABC</strong>
+      ב-AIKO המגעים בצד האחורי (ללא רשת קווים בחזית) — פחות הצללה עצמית, ביצועים טובים יותר בהצללה חלקית, ומראה אחיד (שחור מלא).
+    </div>
+    <div class="conclusion-card">
+      <strong>יתרון תדיראן — שירות מקומי</strong>
+      מותג ישראלי עם רשת מתקינים, מוקד ואחריות מקומית — שיקול חשוב לשקט נפשי, לצד הנתונים הטכניים של הלוח.
+    </div>
+    <div class="conclusion-card">
+      <strong>כלמוביל Energy — ערך כלכלי מצוין</strong>
+      ב-58,339 ₪ כלמוביל מציעה את <strong>המחיר הנמוך ביותר</strong> מבין שלוש ההצעות, עם טכנולוגיה זהה לוולטה (תדיראן 600W + SolarEdge). כשמנטרלים מערכת שטיפה אוטומטית (5,500 ₪ אצל וולטה), הפער מוולטה מצטמצם ל-<strong>~1,274 ₪</strong> (59,613 לעומת 58,339). הגיבוי התאגידי (קבוצת כלמוביל) חזק — אך צריך לוודא שהחוזה כולל אחריות תפוקה מפורשת.
+    </div>
+    <div class="conclusion-card">
+      <strong>בדיקת טענה: "פאנלים בגדלי ביניים" — טיעון מכירתי?</strong>
+      נציג כלמוביל טען שדגמי "ביניים" כמו 670W יהיו קשים להשגה בעתיד. <strong>בדיקה מעמיקה מעלה שהטענה לא מחזיקה מים:</strong>
+      (1) 670W הוא ההספק הגבוה המעשי למגורים ב-2026 — לא "גודל ביניים";
+      (2) AIKO היא ענקית עולמית (מקום 9, Tier 1, 35.5GW כושר ייצור) — לא חברת נישה;
+      (3) מערכת SolarEdge תוכננה בדיוק לערבוב פאנלים שונים באמצעות אופטימייזרים;
+      (4) תחת אחריות — השגת חלף היא באחריות היצרן/המתקין, לא של בעל הבית;
+      (5) גם 600W יהיה "דגם ישן" בעוד 5-10 שנים (הספקים עולים כל הזמן).
+      הסיכון זהה לכל דגם ספציפי — כולל תדיראן 600W. ניתוח מפורט בקובץ נפרד.
+    </div>
+    <div class="conclusion-card conclusion-card--highlight">
+      <strong>שורה תחתונה — השוואה כוללת</strong>
+      <strong>קדמה</strong> — הכי הרבה kWp (13.4) במחיר דומה, פאנל מתקדם יותר, אך אחריות תפוקה מותנית בחוזה תחזוקה חיצוני. <strong>וולטה</strong> — פרימיום: מחיר גבוה יותר, אך שטיפה אוטומטית ואחריות תפוקה אוטומטית ללא תנאים. <strong>כלמוביל</strong> — הזולה ביותר, גיבוי תאגידי חזק, אך פחות שקיפות צרכנית ואחריות תפוקה לא מוגדרת עדיין.
+    </div>
+    <div class="conclusion-card conclusion-card--highlight">
+      <strong>מסגרת להחלטה</strong>
+      יתרון התפעול והשקט הנפשי תלויים לא רק במפרט הלוח אלא בחוזה, באחריות תפוקה ובשירות המתקין. לפני חתימה עם כל חברה: תחזית ייצור חתומה, חוזה מלא עם סעיפי אחריות תפוקה, ו-2–3 ממליצים עדכניים באזור. <strong>מומלץ במיוחד לבקש מכלמוביל הסכם מפורט כמו של וולטה ולוודא שקיימת אחריות תפוקה ייעודית.</strong>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<div class="footer">
+  דוח זה נבנה אוטומטית על בסיס הצעות מחיר, מחקרים ונתונים שנאספו עד אפריל 2026.<br>
+  הנתונים הכלכליים הם הערכות ואינם מהווים ייעוץ פיננסי. יש לוודא נתונים מול כל חברה לפני חתימה.
+</div>
+
+<script>
+// ====================================================================
+// DATA LAYER — Add new companies by adding objects to this array
+// ====================================================================
+const companies = [
+  {
+    id: 'volta',
+    name: 'וולטה סולאר',
+    color: '#ff6b35',
+    colorLight: 'rgba(255,107,53,0.15)',
+    panels: 20,
+    panelWatt: 600,
+    systemKwp: 12,
+    totalPrice: 65113,
+    annualProductionKwh: 17616,
+    degradationYear1: 0.01,
+    degradationAnnual: 0.004,
+    active: true,
+    enabled: true
+  },
+  {
+    id: 'kedma',
+    name: 'קדמה סולאר',
+    color: '#2196f3',
+    colorLight: 'rgba(33,150,243,0.15)',
+    panels: 20,
+    panelWatt: 670,
+    systemKwp: 13.4,
+    totalPrice: 64971,
+    annualProductionKwh: 20700,
+    degradationYear1: 0.01,
+    degradationAnnual: 0.0035,
+    active: true,
+    enabled: true
+  },
+  {
+    id: 'calmobile',
+    name: 'כלמוביל Energy',
+    color: '#4caf50',
+    colorLight: 'rgba(76,175,80,0.15)',
+    panels: 20,
+    panelWatt: 600,
+    systemKwp: 12,
+    totalPrice: 58339,
+    annualProductionKwh: 17200,
+    degradationYear1: 0.004,
+    degradationAnnual: 0.004,
+    active: true,
+    enabled: true
+  },
+  {
+    id: 'solarfield',
+    name: 'סולארפילד',
+    color: '#9c27b0',
+    colorLight: 'rgba(156,39,176,0.15)',
+    panels: 0,
+    panelWatt: 0,
+    systemKwp: 0,
+    totalPrice: 0,
+    annualProductionKwh: 0,
+    degradationYear1: 0.01,
+    degradationAnnual: 0.004,
+    active: false,
+    enabled: false
+  }
+];
+
+// Israel seasonal production factors (% of annual total per month)
+const monthlyFactors = [0.055, 0.065, 0.085, 0.095, 0.105, 0.11, 0.115, 0.105, 0.09, 0.08, 0.055, 0.045];
+const monthNames = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+
+// Tariff scenarios
+const tariffScenarios = {
+  current: { name: 'נוכחי 0.48', getNetRate: (year) => 0.48 * Math.pow(1.005, year), getRetailRate: (year) => 0.64 * Math.pow(1.005, year) },
+  option1: { name: 'אופציה 1', getNetRate: (year) => (year < 5 ? 0.60 : 0.3807) * Math.pow(1.005, year), getRetailRate: (year) => 0.64 * Math.pow(1.005, year) },
+  option2: { name: 'אופציה 2', getNetRate: (year) => 0.39 * Math.pow(1.025, year), getRetailRate: (year) => 0.64 * Math.pow(1.025, year) }
+};
+
+// Chart instances
+let breakevenChart, annualIncomeChart, monthlyChart, pergolaBreakevenChart;
+
+/** פרגולה: וולטה APOLLO / קדמה 5×670W — נתוני עלות וייצור */
+const pergolaOptions = [
+  {
+    name: 'וולטה — APOLLO פרגולה',
+    color: '#ff6b35',
+    price: 11935,
+    annualKwh: 3038,
+    degYear1: 0.01,
+    degAnnual: 0.0056
+  },
+  {
+    name: 'קדמה — 5×670W פרגולה',
+    color: '#2196f3',
+    price: 10529,
+    annualKwh: 5177,
+    degYear1: 0.01,
+    degAnnual: 0.0035
+  },
+  {
+    name: 'כלמוביל — 5×600W פרגולה',
+    color: '#4caf50',
+    price: 5361,
+    annualKwh: 4100,
+    degYear1: 0.004,
+    degAnnual: 0.004
+  }
+];
+
+function getActiveCompanies() { return companies.filter(c => c.active && c.enabled); }
+
+function toggleCompany(id) {
+  const c = companies.find(x => x.id === id);
+  if (!c || !c.enabled) return;
+  c.active = !c.active;
+  const btn = document.getElementById('toggle' + id.charAt(0).toUpperCase() + id.slice(1));
+  if (c.active) {
+    btn.classList.add('active');
+    btn.style.background = c.color;
+    btn.style.color = 'white';
+  } else {
+    btn.classList.remove('active');
+    btn.style.background = 'white';
+    btn.style.color = c.color;
+  }
+  updateAll();
+}
+
+function calcYearProduction(baseProduction, year, degYear1, degAnnual) {
+  if (year === 0) return baseProduction;
+  let prod = baseProduction * (1 - degYear1);
+  for (let y = 2; y <= year; y++) prod *= (1 - degAnnual);
+  return prod;
+}
+
+function calcYearIncome(company, year, monthlyConsumption, daytimePct, tariffKey) {
+  const tariff = tariffScenarios[tariffKey];
+  const yearProd = calcYearProduction(company.annualProductionKwh, year, company.degradationYear1, company.degradationAnnual);
+  const netRate = tariff.getNetRate(year);
+  const retailRate = tariff.getRetailRate(year);
+
+  let totalSelfIncome = 0;
+  let totalGridIncome = 0;
+
+  for (let m = 0; m < 12; m++) {
+    const monthProd = yearProd * monthlyFactors[m];
+    const monthConsumptionDay = monthlyConsumption * daytimePct;
+    const selfConsumed = Math.min(monthProd, monthConsumptionDay);
+    const exported = monthProd - selfConsumed;
+
+    totalSelfIncome += selfConsumed * retailRate;
+    totalGridIncome += exported * netRate;
+  }
+
+  return { total: totalSelfIncome + totalGridIncome, self: totalSelfIncome, grid: totalGridIncome, production: yearProd };
+}
+
+/** הכנסה שנתית ממכירה לרשת בלבד (ללא צריכה עצמית, ללא 0.64 ₪) */
+function calcYearIncomeExportOnly(annualKwhYear1, year, degYear1, degAnnual, tariffKey) {
+  const tariff = tariffScenarios[tariffKey];
+  const yearProd = calcYearProduction(annualKwhYear1, year, degYear1, degAnnual);
+  return yearProd * tariff.getNetRate(year);
+}
+
+function updatePergolaBreakevenChart() {
+  const tariffKey = document.getElementById('tariffSelect').value;
+  const years = Array.from({ length: 26 }, (_, i) => i);
+  const datasets = pergolaOptions.map((opt) => {
+    let cumulative = -opt.price;
+    const data = [cumulative];
+    for (let y = 1; y <= 25; y++) {
+      cumulative += calcYearIncomeExportOnly(opt.annualKwh, y, opt.degYear1, opt.degAnnual, tariffKey);
+      data.push(Math.round(cumulative));
+    }
+    return {
+      label: opt.name,
+      data,
+      borderColor: opt.color,
+      backgroundColor: opt.color + '18',
+      borderWidth: 3,
+      pointRadius: 2,
+      fill: false,
+      tension: 0.3
+    };
+  });
+  datasets.push({
+    label: 'נקודת איפוס',
+    data: years.map(() => 0),
+    borderColor: '#999',
+    borderDash: [5, 5],
+    borderWidth: 1,
+    pointRadius: 0,
+    fill: false
+  });
+
+  if (pergolaBreakevenChart) pergolaBreakevenChart.destroy();
+  pergolaBreakevenChart = new Chart(document.getElementById('pergolaBreakevenChart'), {
+    type: 'line',
+    data: { labels: years.map((y) => (y === 0 ? 'התחלה' : 'שנה ' + y)), datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', rtl: true, labels: { font: { family: 'Segoe UI' } } },
+        title: {
+          display: true,
+          text: 'מצטבר — מכירה לרשת בלבד (פרגולה)',
+          font: { size: 14, family: 'Segoe UI' }
+        },
+        tooltip: {
+          rtl: true,
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('he-IL')} ₪`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 13 } },
+        y: {
+          ticks: { callback: (v) => v.toLocaleString('he-IL') + ' ₪' },
+          grid: { color: (ctx) => (ctx.tick.value === 0 ? '#e53935' : '#eee') }
+        }
+      }
+    }
+  });
+}
+
+function updateFinancialCards() {
+  const consumption = +document.getElementById('consumptionSlider').value;
+  const daytime = +document.getElementById('daytimeSlider').value / 100;
+  const tariffKey = document.getElementById('tariffSelect').value;
+  const active = getActiveCompanies();
+
+  let html = '';
+  active.forEach(c => {
+    let cumulative = -c.totalPrice;
+    let totalIncome = 0;
+    let paybackYear = null;
+
+    for (let y = 1; y <= 25; y++) {
+      const income = calcYearIncome(c, y, consumption, daytime, tariffKey);
+      totalIncome += income.total;
+      cumulative += income.total;
+      if (paybackYear === null && cumulative >= 0) {
+        const prevCum = cumulative - income.total;
+        const fraction = -prevCum / income.total;
+        paybackYear = y - 1 + fraction;
+      }
+    }
+
+    const netProfit = totalIncome - c.totalPrice;
+    const avgReturn = ((totalIncome / c.totalPrice - 1) / 25 * 100);
+    const lcoe = c.totalPrice / (function() { let t = 0; for(let y=1;y<=25;y++) t += calcYearProduction(c.annualProductionKwh, y, c.degradationYear1, c.degradationAnnual); return t; })();
+
+    html += `
+      <div class="summary-card" style="border-top: 4px solid ${c.color};">
+        <div style="font-weight:700; color:${c.color}; margin-bottom:8px;">${c.name}</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; text-align:center;">
+          <div><div class="value" style="font-size:1.2rem;">${Math.round(totalIncome).toLocaleString('he-IL')} ₪</div><div class="label">הכנסה כוללת 25 שנה</div></div>
+          <div><div class="value" style="font-size:1.2rem; color:var(--green);">${Math.round(netProfit).toLocaleString('he-IL')} ₪</div><div class="label">רווח נקי</div></div>
+          <div><div class="value" style="font-size:1.2rem;">${paybackYear ? paybackYear.toFixed(1) : '—'}</div><div class="label">שנות החזר</div></div>
+          <div><div class="value" style="font-size:1.2rem;">${avgReturn.toFixed(1)}%</div><div class="label">תשואה שנתית ממוצעת</div></div>
+          <div><div class="value" style="font-size:1.2rem;">${lcoe.toFixed(2)} ₪</div><div class="label">עלות ל-kWh (LCOE)</div></div>
+          <div><div class="value" style="font-size:1.2rem;">${c.totalPrice.toLocaleString('he-IL')} ₪</div><div class="label">השקעה</div></div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('financialCards').innerHTML = html;
+}
+
+function updateBreakevenChart() {
+  const consumption = +document.getElementById('consumptionSlider').value;
+  const daytime = +document.getElementById('daytimeSlider').value / 100;
+  const tariffKey = document.getElementById('tariffSelect').value;
+  const active = getActiveCompanies();
+  const years = Array.from({length: 26}, (_, i) => i);
+
+  const datasets = active.map(c => {
+    let cumulative = -c.totalPrice;
+    const data = [cumulative];
+    for (let y = 1; y <= 25; y++) {
+      const income = calcYearIncome(c, y, consumption, daytime, tariffKey);
+      cumulative += income.total;
+      data.push(Math.round(cumulative));
+    }
+    return {
+      label: c.name,
+      data,
+      borderColor: c.color,
+      backgroundColor: c.colorLight,
+      borderWidth: 3,
+      pointRadius: 2,
+      fill: false,
+      tension: 0.3
+    };
+  });
+
+  // Zero line dataset
+  datasets.push({
+    label: 'נקודת איפוס',
+    data: years.map(() => 0),
+    borderColor: '#999',
+    borderDash: [5, 5],
+    borderWidth: 1,
+    pointRadius: 0,
+    fill: false
+  });
+
+  if (breakevenChart) breakevenChart.destroy();
+  breakevenChart = new Chart(document.getElementById('breakevenChart'), {
+    type: 'line',
+    data: { labels: years.map(y => y === 0 ? 'התחלה' : 'שנה ' + y), datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', rtl: true, labels: { font: { family: 'Segoe UI' } } },
+        tooltip: {
+          rtl: true, callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('he-IL')} ₪`
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 13 } },
+        y: {
+          ticks: { callback: v => v.toLocaleString('he-IL') + ' ₪' },
+          grid: { color: ctx => ctx.tick.value === 0 ? '#e53935' : '#eee' }
+        }
+      }
+    }
+  });
+}
+
+function updateAnnualIncomeChart() {
+  const consumption = +document.getElementById('consumptionSlider').value;
+  const daytime = +document.getElementById('daytimeSlider').value / 100;
+  const tariffKey = document.getElementById('tariffSelect').value;
+  const active = getActiveCompanies();
+  const years = Array.from({length: 25}, (_, i) => i + 1);
+
+  const datasets = [];
+  active.forEach(c => {
+    const selfData = [], gridData = [];
+    for (let y = 1; y <= 25; y++) {
+      const income = calcYearIncome(c, y, consumption, daytime, tariffKey);
+      selfData.push(Math.round(income.self));
+      gridData.push(Math.round(income.grid));
+    }
+    datasets.push({
+      label: c.name + ' — צריכה עצמית',
+      data: selfData,
+      backgroundColor: c.color,
+      stack: c.id
+    });
+    datasets.push({
+      label: c.name + ' — מכירה לרשת',
+      data: gridData,
+      backgroundColor: c.color + '66',
+      stack: c.id
+    });
+  });
+
+  if (annualIncomeChart) annualIncomeChart.destroy();
+  annualIncomeChart = new Chart(document.getElementById('annualIncomeChart'), {
+    type: 'bar',
+    data: { labels: years.map(y => y), datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', rtl: true, labels: { font: { size: 11, family: 'Segoe UI' } } },
+        tooltip: { rtl: true, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('he-IL')} ₪` } }
+      },
+      scales: {
+        x: { stacked: true, title: { display: true, text: 'שנה' } },
+        y: { stacked: true, ticks: { callback: v => v.toLocaleString('he-IL') + ' ₪' } }
+      }
+    }
+  });
+}
+
+function updateMonthlyChart() {
+  const consumption = +document.getElementById('consumptionSlider').value;
+  const active = getActiveCompanies();
+
+  const datasets = active.map(c => ({
+    label: c.name + ' — ייצור',
+    data: monthlyFactors.map(f => Math.round(c.annualProductionKwh * f)),
+    backgroundColor: c.color + '88',
+    borderColor: c.color,
+    borderWidth: 1
+  }));
+
+  datasets.push({
+    label: 'צריכה חודשית',
+    data: monthlyFactors.map(() => consumption),
+    type: 'line',
+    borderColor: '#e53935',
+    borderWidth: 2,
+    borderDash: [6, 3],
+    pointRadius: 0,
+    fill: false
+  });
+
+  if (monthlyChart) monthlyChart.destroy();
+  monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: { labels: monthNames, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', rtl: true, labels: { font: { size: 11, family: 'Segoe UI' } } },
+        tooltip: { rtl: true, callbacks: { label: ctx => `${ctx.dataset.label}: ${Math.round(ctx.parsed.y).toLocaleString('he-IL')} kWh` } }
+      },
+      scales: {
+        y: { ticks: { callback: v => v.toLocaleString('he-IL') + ' kWh' } }
+      }
+    }
+  });
+}
+
+function updateAll() {
+  updateFinancialCards();
+  updateBreakevenChart();
+  updateAnnualIncomeChart();
+  updateMonthlyChart();
+  updatePergolaBreakevenChart();
+}
+
+// Slider events
+document.getElementById('consumptionSlider').addEventListener('input', function() {
+  document.getElementById('consumptionValue').textContent = this.value + ' kWh';
+  updateAll();
+});
+document.getElementById('daytimeSlider').addEventListener('input', function() {
+  document.getElementById('daytimeValue').textContent = this.value + '%';
+  updateAll();
+});
+document.getElementById('tariffSelect').addEventListener('change', updateAll);
+
+// ——— מקטעים מתקפלים + גרפים ———
+function resizeAllCharts() {
+  [breakevenChart, annualIncomeChart, monthlyChart, pergolaBreakevenChart].forEach((c) => {
+    if (c && typeof c.resize === 'function') {
+      try { c.resize(); } catch (e) { /* ignore */ }
+    }
+  });
+}
+
+function setReportSectionOpen(section, open, opts) {
+  const skipCharts = opts && opts.skipChartRefresh;
+  if (!section || !section.classList.contains('report-collapsible')) return;
+  section.classList.toggle('is-collapsed', !open);
+  section.classList.toggle('is-open', open);
+  const btn = section.querySelector('.report-collapsible__trigger');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (!skipCharts && open && (section.id === 'financial' || section.id === 'pergola')) {
+    setTimeout(() => {
+      updateAll();
+      resizeAllCharts();
+    }, 120);
+  }
+}
+
+document.querySelectorAll('.report-collapsible__trigger').forEach((trigger) => {
+  trigger.addEventListener('click', () => {
+    const section = trigger.closest('.report-collapsible');
+    const currentlyOpen = section && !section.classList.contains('is-collapsed');
+    setReportSectionOpen(section, !currentlyOpen);
+  });
+});
+
+const expandAllBtn = document.getElementById('expandAllSections');
+const collapseAllBtn = document.getElementById('collapseAllSections');
+if (expandAllBtn) {
+  expandAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('[data-collapsible]').forEach((s) => setReportSectionOpen(s, true, { skipChartRefresh: true }));
+    setTimeout(() => {
+      updateAll();
+      resizeAllCharts();
+    }, 180);
+  });
+}
+if (collapseAllBtn) {
+  collapseAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('[data-collapsible]').forEach((s) => setReportSectionOpen(s, false));
+  });
+}
+
+function expandCollapsibleForId(id) {
+  const el = document.getElementById(id);
+  if (el && el.classList.contains('report-collapsible')) setReportSectionOpen(el, true);
+}
+
+document.querySelectorAll('.section-nav a[href^="#"]').forEach((a) => {
+  a.addEventListener('click', () => {
+    const id = (a.getAttribute('href') || '').replace('#', '');
+    if (id) setTimeout(() => expandCollapsibleForId(id), 0);
+  });
+});
+
+window.addEventListener('hashchange', () => {
+  const id = (window.location.hash || '').replace('#', '');
+  if (id) expandCollapsibleForId(id);
+});
+
+// Init
+updateAll();
+setTimeout(() => {
+  if (window.location.hash) {
+    expandCollapsibleForId(window.location.hash.replace('#', ''));
+    resizeAllCharts();
+  }
+}, 200);
+window.addEventListener('resize', () => { resizeAllCharts(); });
+</script>
+
+</body>
+</html>

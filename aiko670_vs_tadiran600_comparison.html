@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>השוואת פאנלים — AIKO 670W vs Tadiran 600W</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06090f;
+    --surface: #0d1320;
+    --surface2: #131c2e;
+    --border: #1a2744;
+    --text: #e4eaf4;
+    --text-muted: #7b8da6;
+    --aiko: #f97316;
+    --aiko-dim: rgba(249,115,22,0.10);
+    --tadiran: #3b82f6;
+    --tadiran-dim: rgba(59,130,246,0.10);
+    --green: #10b981;
+    --green-dim: rgba(16,185,129,0.10);
+    --equal: #8b5cf6;
+    --equal-dim: rgba(139,92,246,0.10);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+  .container { max-width:1050px; margin:0 auto; padding:36px 20px 48px; }
+
+  .header { text-align:center; margin-bottom:44px; }
+  .header h1 {
+    font-family:'Rubik',sans-serif; font-size:1.9rem; font-weight:800;
+    background:linear-gradient(135deg,#fff 0%,#8899b3 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:6px;
+  }
+  .header .sub { color:var(--text-muted); font-size:0.95rem; font-weight:300; }
+  .brands { display:flex; justify-content:center; gap:16px; margin-top:20px; flex-wrap:wrap; }
+  .brand-tag {
+    display:flex; align-items:center; gap:7px;
+    padding:8px 20px; border-radius:100px; font-weight:600; font-size:0.88rem;
+  }
+  .brand-tag .dot { width:10px; height:10px; border-radius:50%; }
+  .brand-tag.ak { background:var(--aiko-dim); color:var(--aiko); border:1px solid rgba(249,115,22,0.25); }
+  .brand-tag.ak .dot { background:var(--aiko); }
+  .brand-tag.td { background:var(--tadiran-dim); color:var(--tadiran); border:1px solid rgba(59,130,246,0.25); }
+  .brand-tag.td .dot { background:var(--tadiran); }
+
+  .source-note {
+    text-align:center; margin-bottom:32px; padding:12px 20px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    color:var(--text-muted); font-size:0.82rem;
+  }
+  .source-note strong { color:var(--text); }
+
+  /* Summary */
+  .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:36px; }
+  .summary-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px 20px; text-align:center;
+  }
+  .summary-card h3 { font-size:0.78rem; color:var(--text-muted); font-weight:400; margin-bottom:4px; }
+  .summary-card .value { font-family:'Rubik',sans-serif; font-size:1.8rem; font-weight:700; }
+  .summary-card .unit { font-size:0.85rem; font-weight:400; color:var(--text-muted); }
+  .summary-card .sub-val { font-size:0.82rem; color:var(--text-muted); margin-top:2px; }
+  .summary-card.ak { border-top:3px solid var(--aiko); }
+  .summary-card.ak .value { color:var(--aiko); }
+  .summary-card.td { border-top:3px solid var(--tadiran); }
+  .summary-card.td .value { color:var(--tadiran); }
+
+  .section { margin-bottom:32px; }
+  .section-title {
+    font-family:'Rubik',sans-serif; font-size:1.1rem; font-weight:600;
+    margin-bottom:14px; display:flex; align-items:center; gap:9px;
+  }
+
+  .comp-table {
+    width:100%; border-collapse:separate; border-spacing:0;
+    background:var(--surface); border-radius:12px; overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .comp-table thead th {
+    padding:13px 16px; font-weight:600; font-size:0.85rem;
+    text-align:center; background:var(--surface2);
+    border-bottom:1px solid var(--border);
+  }
+  .comp-table thead th:first-child { text-align:right; width:32%; }
+  .comp-table thead th.ak-col { color:var(--aiko); }
+  .comp-table thead th.td-col { color:var(--tadiran); }
+  .comp-table thead th.diff-col { color:var(--text-muted); font-size:0.8rem; }
+
+  .comp-table tbody td {
+    padding:11px 16px; font-size:0.9rem; text-align:center;
+    border-bottom:1px solid rgba(26,39,68,0.5);
+  }
+  .comp-table tbody tr:hover td { background:rgba(255,255,255,0.015); }
+  .comp-table tbody tr:last-child td { border-bottom:none; }
+  .comp-table tbody td:first-child { text-align:right; color:var(--text-muted); font-weight:400; }
+
+  .best { font-weight:700; }
+  .best.ak { color:var(--aiko); }
+  .best.td { color:var(--tadiran); }
+
+  .diff-cell { font-size:0.82rem; font-weight:600; }
+  .diff-cell.pos { color:var(--green); }
+  .diff-cell.neg { color:#ef4444; }
+  .diff-cell.eq { color:var(--equal); }
+
+  .badge {
+    display:inline-block; padding:1px 7px; border-radius:4px;
+    font-size:0.7rem; font-weight:600; margin-right:3px;
+  }
+  .badge.g { background:var(--green-dim); color:var(--green); }
+  .badge.eq { background:var(--equal-dim); color:var(--equal); }
+
+  .conclusions {
+    background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);
+    border:1px solid var(--border); border-radius:12px; padding:26px 28px;
+  }
+  .conclusions h2 {
+    font-family:'Rubik',sans-serif; font-size:1.2rem; font-weight:700;
+    margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .ci { display:flex; gap:11px; margin-bottom:13px; align-items:flex-start; }
+  .ci:last-child { margin-bottom:0; }
+  .cb {
+    width:24px; height:24px; min-width:24px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.73rem; margin-top:3px; font-weight:700;
+  }
+  .cb.o { background:var(--aiko-dim); color:var(--aiko); }
+  .cb.g { background:var(--green-dim); color:var(--green); }
+  .cb.b { background:var(--tadiran-dim); color:var(--tadiran); }
+  .ct { font-size:0.93rem; line-height:1.7; }
+  .ct strong { color:#fff; }
+  .hak { color:var(--aiko); font-weight:600; }
+  .htd { color:var(--tadiran); font-weight:600; }
+
+  .note { text-align:center; margin-top:28px; color:var(--text-muted); font-size:0.78rem; }
+
+  @media(max-width:700px){
+    .summary-grid { grid-template-columns:1fr; }
+    .comp-table { font-size:0.8rem; }
+    .comp-table thead th,.comp-table tbody td { padding:9px 8px; }
+    .header h1 { font-size:1.4rem; }
+    .brands { flex-direction:column; align-items:center; gap:8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>השוואת פאנלים סולאריים</h1>
+    <p class="sub">נתונים מדויקים מתוך מפרטי היצרן</p>
+    <div class="brands">
+      <div class="brand-tag ak"><span class="dot"></span>AIKO COMET 3N72 — 670W</div>
+      <div class="brand-tag td"><span class="dot"></span>Tadiran DM600 — 600W</div>
+    </div>
+  </div>
+
+  <div class="source-note">
+    <strong>מקורות נתונים:</strong>
+    AIKO — מפרט COMET 3N72 AIKO-A-MDE72Mw, דגם AIKO-A670-MDE72Mw (V4.1, אוקטובר 2025)
+    &nbsp;|&nbsp;
+    Tadiran — מפרט DMxxxM10T-B72HSW, דגם DM600M10T-B72HSW
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <div class="summary-card ak">
+      <h3>AIKO-A670-MDE72Mw</h3>
+      <div class="value">670<span class="unit"> W</span></div>
+      <div class="sub-val">נצילות 24.8% &nbsp;|&nbsp; 28.2 ק"ג</div>
+    </div>
+    <div class="summary-card td">
+      <h3>Tadiran DM600M10T-B72HSW</h3>
+      <div class="value">600<span class="unit"> W</span></div>
+      <div class="sub-val">נצילות 23.2% &nbsp;|&nbsp; 31.8 ק"ג</div>
+    </div>
+  </div>
+
+  <!-- General Specs -->
+  <div class="section">
+    <div class="section-title">📐 מפרט כללי</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>טכנולוגיית תאים</td>
+          <td class="best ak">N-type ABC (Back Contact)</td>
+          <td>N-type Mono-crystalline</td>
+          <td class="diff-cell pos">דור מתקדם יותר</td>
+        </tr>
+        <tr>
+          <td>מספר תאים</td>
+          <td>144 (6×24)</td>
+          <td>144 (6×24)</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+        <tr>
+          <td>מידות (מ"מ)</td>
+          <td>2382 × 1134 × 30</td>
+          <td>2278 × 1134 × 30</td>
+          <td class="diff-cell eq">AIKO ארוך ב-104 מ"מ</td>
+        </tr>
+        <tr>
+          <td>שטח פאנל (מ"ר)</td>
+          <td>2.701</td>
+          <td>2.583</td>
+          <td class="diff-cell eq">+4.6%</td>
+        </tr>
+        <tr>
+          <td>משקל (ק"ג)</td>
+          <td class="best ak">28.2 ±3%</td>
+          <td>31.8</td>
+          <td class="diff-cell pos">AIKO קל ב-3.6 ק"ג</td>
+        </tr>
+        <tr>
+          <td>זכוכית קדמית</td>
+          <td>3.2 מ"מ מחוסמת</td>
+          <td>2 מ"מ מחוסמת + AR</td>
+          <td class="diff-cell eq">AIKO עבה יותר</td>
+        </tr>
+        <tr>
+          <td>מחבר</td>
+          <td>MC4 / MC4-EVO2A</td>
+          <td>PV-ZH202B / MC4-EVO2A</td>
+          <td class="diff-cell eq">תואם</td>
+        </tr>
+        <tr>
+          <td>דיודות מעקף</td>
+          <td>3</td>
+          <td>3</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Electrical STC -->
+  <div class="section">
+    <div class="section-title">⚡ מפרט חשמלי — תנאי STC</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>הספק מרבי Pmax (W)</td>
+          <td class="best ak">670</td>
+          <td>600</td>
+          <td class="diff-cell pos">+70W (+11.7%)</td>
+        </tr>
+        <tr>
+          <td>נצילות מודול (%)</td>
+          <td class="best ak">24.8%</td>
+          <td>23.2%</td>
+          <td class="diff-cell pos">+1.6 נ"א</td>
+        </tr>
+        <tr>
+          <td>מתח הפתוח Voc (V)</td>
+          <td class="best ak">54.50</td>
+          <td>53.30</td>
+          <td class="diff-cell pos">+1.20V</td>
+        </tr>
+        <tr>
+          <td>מתח Vmp (V)</td>
+          <td class="best ak">45.70</td>
+          <td>44.61</td>
+          <td class="diff-cell pos">+1.09V</td>
+        </tr>
+        <tr>
+          <td>זרם קצר Isc (A)</td>
+          <td class="best ak">15.35</td>
+          <td>14.23</td>
+          <td class="diff-cell pos">+1.12A</td>
+        </tr>
+        <tr>
+          <td>זרם Imp (A)</td>
+          <td class="best ak">14.67</td>
+          <td>13.47</td>
+          <td class="diff-cell pos">+1.20A</td>
+        </tr>
+        <tr>
+          <td>סבילות הספק</td>
+          <td>0 ~ +3%</td>
+          <td>0 ~ +3%</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- NOCT -->
+  <div class="section">
+    <div class="section-title">🌤️ ביצועים בתנאי NOCT (קרובים לשטח)</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>הספק NOCT (W)</td>
+          <td class="best ak">508</td>
+          <td>452</td>
+          <td class="diff-cell pos">+56W (+12.4%)</td>
+        </tr>
+        <tr>
+          <td>Voc NOCT (V)</td>
+          <td class="best ak">51.71</td>
+          <td>50.19</td>
+          <td class="diff-cell pos">+1.52V</td>
+        </tr>
+        <tr>
+          <td>Vmp NOCT (V)</td>
+          <td class="best ak">43.36</td>
+          <td>41.72</td>
+          <td class="diff-cell pos">+1.64V</td>
+        </tr>
+        <tr>
+          <td>Isc NOCT (A)</td>
+          <td class="best ak">12.40</td>
+          <td>11.53</td>
+          <td class="diff-cell pos">+0.87A</td>
+        </tr>
+        <tr>
+          <td>Imp NOCT (A)</td>
+          <td class="best ak">11.72</td>
+          <td>10.83</td>
+          <td class="diff-cell pos">+0.89A</td>
+        </tr>
+        <tr>
+          <td>יחס NOCT/STC</td>
+          <td class="best ak">75.8%</td>
+          <td>75.3%</td>
+          <td class="diff-cell pos">AIKO שומר יותר הספק בחום</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Temperature -->
+  <div class="section">
+    <div class="section-title">🌡️ מקדמי טמפרטורה</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>מקדם טמפ' Pmax (%/°C)</td>
+          <td class="best ak">-0.26</td>
+          <td>-0.29</td>
+          <td class="diff-cell pos">AIKO מאבד פחות בחום</td>
+        </tr>
+        <tr>
+          <td>מקדם טמפ' Voc (%/°C)</td>
+          <td class="best ak">-0.22</td>
+          <td>-0.25</td>
+          <td class="diff-cell pos">AIKO עדיף ב-12%</td>
+        </tr>
+        <tr>
+          <td>מקדם טמפ' Isc (%/°C)</td>
+          <td>+0.05</td>
+          <td>+0.048</td>
+          <td class="diff-cell eq">דומה</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Degradation & Warranty -->
+  <div class="section">
+    <div class="section-title">📉 דגרדציה ואחריות</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>דגרדציה שנה ראשונה</td>
+          <td class="best ak">≤1%</td>
+          <td>≤2%</td>
+          <td class="diff-cell pos">AIKO פי 2 טוב יותר</td>
+        </tr>
+        <tr>
+          <td>דגרדציה שנתית (שנה 2+)</td>
+          <td class="best ak">≤0.35%</td>
+          <td>≤0.55%</td>
+          <td class="diff-cell pos">AIKO פי 1.6 טוב יותר</td>
+        </tr>
+        <tr>
+          <td>תפוקה משוערת — 25 שנה</td>
+          <td class="best ak">~90.6%</td>
+          <td>~84.5%</td>
+          <td class="diff-cell pos">+6.1 נ"א</td>
+        </tr>
+        <tr>
+          <td>תפוקה משוערת — 30 שנה</td>
+          <td class="best ak">~88.85%</td>
+          <td>~81.8%</td>
+          <td class="diff-cell pos">+7.1 נ"א</td>
+        </tr>
+        <tr>
+          <td>אחריות מוצר</td>
+          <td class="best ak">15 שנים (ניתן להרחבה ל-25)</td>
+          <td>לא צוין במפרט</td>
+          <td class="diff-cell pos">—</td>
+        </tr>
+        <tr>
+          <td>אחריות ביצועים</td>
+          <td class="best ak">30 שנים</td>
+          <td>לא צוין במפרט</td>
+          <td class="diff-cell pos">—</td>
+        </tr>
+        <tr>
+          <td>שותף אחריות</td>
+          <td>Munich RE + TÜV Rheinland</td>
+          <td>לא צוין</td>
+          <td class="diff-cell pos">ביטוח בינלאומי</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mechanical -->
+  <div class="section">
+    <div class="section-title">🔧 עמידות מכנית והתקנה</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>עומס שלג קדמי (Pa)</td>
+          <td>5400</td>
+          <td>5400</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+        <tr>
+          <td>עומס רוח אחורי (Pa)</td>
+          <td>2400</td>
+          <td>2400</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+        <tr>
+          <td>דרגת הגנה IP</td>
+          <td>IP68</td>
+          <td>IP68</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+        <tr>
+          <td>בדיקת ברד</td>
+          <td>25mm @ 23m/s</td>
+          <td>לא צוין</td>
+          <td class="diff-cell eq">—</td>
+        </tr>
+        <tr>
+          <td>סיווג אש</td>
+          <td>IEC Class C</td>
+          <td>Class II</td>
+          <td class="diff-cell eq">סיווגים שונים</td>
+        </tr>
+        <tr>
+          <td>מתח מערכת מרבי</td>
+          <td>DC 1500V</td>
+          <td>DC 1500V (IEC)</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+        <tr>
+          <td>טווח טמפ' הפעלה</td>
+          <td>-40°C עד +85°C</td>
+          <td>-40°C עד +85°C</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+        <tr>
+          <td>נתיך מרבי</td>
+          <td>25A</td>
+          <td>30A</td>
+          <td class="diff-cell eq">תדיראן גבוה יותר</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Power Density -->
+  <div class="section">
+    <div class="section-title">📊 צפיפות הספק ויעילות התקנה</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th>פרמטר</th>
+        <th class="ak-col">AIKO 670W</th>
+        <th class="td-col">Tadiran 600W</th>
+        <th class="diff-col">הפרש</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td>הספק למ"ר (W/m²)</td>
+          <td class="best ak">248.1</td>
+          <td>232.3</td>
+          <td class="diff-cell pos">+6.8%</td>
+        </tr>
+        <tr>
+          <td>וואט לק"ג (W/kg)</td>
+          <td class="best ak">23.8</td>
+          <td>18.9</td>
+          <td class="diff-cell pos">+25.9%</td>
+        </tr>
+        <tr>
+          <td>פאנלים נדרשים ל-10 kWp</td>
+          <td class="best ak">~15 פאנלים</td>
+          <td>~17 פאנלים</td>
+          <td class="diff-cell pos">2 פאנלים פחות</td>
+        </tr>
+        <tr>
+          <td>שטח גג נדרש ל-10 kWp</td>
+          <td class="best ak">~40.3 מ"ר</td>
+          <td>~43.1 מ"ר</td>
+          <td class="diff-cell pos">חיסכון של ~2.8 מ"ר</td>
+        </tr>
+        <tr>
+          <td>משקל כולל ל-10 kWp (ק"ג)</td>
+          <td class="best ak">~423 ק"ג</td>
+          <td>~541 ק"ג</td>
+          <td class="diff-cell pos">קל ב-118 ק"ג (!)</td>
+        </tr>
+        <tr>
+          <td>פאנלים לפאלט</td>
+          <td>36</td>
+          <td>36</td>
+          <td class="diff-cell eq">זהה</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Conclusions -->
+  <div class="conclusions">
+    <h2>🏆 מסקנות</h2>
+
+    <div class="ci">
+      <div class="cb o">1</div>
+      <div class="ct">
+        <strong>הספק ונצילות:</strong>
+        <span class="hak">AIKO 670W</span> מספק <strong>70W יותר (+11.7%)</strong> בנצילות <strong>24.8%</strong> מול 23.2% של <span class="htd">תדיראן</span>. הפער נשמר גם בתנאי NOCT (שטח): 508W מול 452W — יתרון של <strong>+12.4%</strong> בתנאים אמיתיים.
+      </div>
+    </div>
+
+    <div class="ci">
+      <div class="cb o">2</div>
+      <div class="ct">
+        <strong>משקל — יתרון דרמטי:</strong>
+        <span class="hak">AIKO</span> שוקל רק <strong>28.2 ק"ג</strong> מול 31.8 ק"ג של <span class="htd">תדיראן</span> — קל ב-11.3%. למערכת 10 kWp זה חיסכון של כ-<strong>118 ק"ג</strong> על הגג. יתרון קריטי לגגות עם מגבלות עומס.
+      </div>
+    </div>
+
+    <div class="ci">
+      <div class="cb g">3</div>
+      <div class="ct">
+        <strong>מקדמי טמפרטורה — קריטי לישראל:</strong>
+        מקדם Pmax של <span class="hak">-0.26%/°C</span> מול -0.29%/°C, ומקדם Voc של <span class="hak">-0.22%/°C</span> מול -0.25%/°C. בימי קיץ ישראליים כשהפאנל מגיע ל-65°C, ה-AIKO מאבד פחות הספק — הפרש שמצטבר ל-<strong>1.5%-2.5% יותר ייצור שנתי</strong>.
+      </div>
+    </div>
+
+    <div class="ci">
+      <div class="cb g">4</div>
+      <div class="ct">
+        <strong>דגרדציה לטווח ארוך:</strong>
+        אחרי 25 שנה, <span class="hak">AIKO</span> ישמור על כ-<strong>90.6%</strong> מהתפוקה, <span class="htd">תדיראן</span> על כ-<strong>84.5%</strong>. הפער של ~6% בתפוקה אחרי 25 שנה מתרגם, במערכת 10 kWp בישראל, לאלפי קוט"ש נוספים = אלפי שקלים.
+      </div>
+    </div>
+
+    <div class="ci">
+      <div class="cb g">5</div>
+      <div class="ct">
+        <strong>טכנולוגיית ABC:</strong>
+        <span class="hak">AIKO</span> משתמשת בטכנולוגיית All Back Contact — כל המגעים בצד האחורי, ללא gridlines בחזית. יתרונות: הצללה עצמית אפסית, ביצועי הצללה חלקית טובים יותר, ומראה אסתטי אחיד (שחור מלא).
+      </div>
+    </div>
+
+    <div class="ci">
+      <div class="cb b">6</div>
+      <div class="ct">
+        <strong>יתרון תדיראן — שירות ונוכחות מקומית:</strong>
+        <span class="htd">תדיראן</span> מציעה שירות ישראלי מלא, רשת מתקינים מוסמכים, מוקד תמיכה טלפוני, ואחריות מקומית. עבור לקוח ביתי ששם דגש על שקט נפשי ושירות — זה שיקול חשוב.
+      </div>
+    </div>
+
+    <div class="ci">
+      <div class="cb o">⭐</div>
+      <div class="ct">
+        <strong>שורה תחתונה:</strong>
+        <span class="hak">AIKO-A670-MDE72Mw</span> עדיף טכנית בכל פרמטר מדיד: הספק, נצילות, משקל, מקדמי טמפרטורה, ודגרדציה. עבור גגות ביתיים בישראל, השילוב של נצילות גבוהה + משקל קל + מקדם טמפרטורה נמוך הופך אותו לבחירה מצוינת. ההחלטה הסופית צריכה לקחת בחשבון גם מחיר בפועל (₪/W), זמינות בשוק הישראלי, ואיכות ההתקנה והשירות.
+      </div>
+    </div>
+  </div>
+
+  <p class="note">* כל הנתונים לקוחים ישירות ממפרטי היצרן הרשמיים שצורפו. חישובי צפיפות הספק ותפוקת 25/30 שנה הם הערכות מחושבות.</p>
+
+</div>
+</body>
+</html>
